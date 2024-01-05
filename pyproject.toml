@@ -1,0 +1,28 @@
+[tool.poetry]
+name = "kazino"
+version = "0.1.0"
+description = ""
+authors = ["Stasoon <stas.csa@ya.ru>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.10"
+aiogram = {version = "^3.0.0rc1", allow-prereleases = true}
+loguru = "^0.7.0"
+python-dotenv = "^1.0.0"
+tortoise-orm = {extras = ["asyncpg"], version = "^0.20.0"}
+pydantic = "^2.1.1"
+cachetools = "^5.3.1"
+pillow = "^10.0.0"
+matplotlib = "^3.8.0"
+redis = "^5.0.1"
+
+
+
+[tool.aerich]
+tortoise_orm = "src.database.database_connection.TORTOISE_ORM"
+location = "src/database/migrations"
+src_folder = "./."
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"

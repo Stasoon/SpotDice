@@ -1,0 +1,1 @@
+Статья с фотографиями: https://telegra.ph/SpotDice-resources-01-02
