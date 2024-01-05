@@ -71,7 +71,7 @@ class UserPrivateGameKeyboards:
             action='show', game_category=GameCategory.BLACKJACK, game_type=GameType.BJ))
         builder.button(text='🎴 Baccarat', callback_data=GamesCallback(
             action='show', game_category=GameCategory.BACCARAT, game_type=GameType.BACCARAT))
-        builder.button(text='EvenUneven', url='https://t.me/SpotDiceU')
+        builder.button(text='⚪ EvenUNeven', url='https://t.me/+lLucdqFEjK9mZDUy')
         builder.adjust(1)
         return builder.as_markup()
 

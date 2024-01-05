@@ -23,8 +23,7 @@ async def deduct_bet_from_user_balance(user_telegram_id: int, amount: float, gam
 async def get_total_bets_sum():
     total_bets_sum = (
         await Bet
-        .all()
         .annotate(bets_sum=Sum('amount'))
-        .values()
+        .values('bets_sum')
     )
     return float(total_bets_sum[0]['bets_sum'] if total_bets_sum else 0)

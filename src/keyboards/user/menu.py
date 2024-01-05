@@ -15,7 +15,7 @@ class UserMenuKeyboards:
     def get_user_agreement() -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
         builder.button(
-            text='Пользовательское соглашение',
+            text='📃 Соглашение',
             web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4')
         )
         return builder.as_markup()
@@ -89,10 +89,10 @@ class UserMenuKeyboards:
         """Возвращает клавиатуру, которая должна отображаться при переходе во вкладку Информация"""
         builder = InlineKeyboardBuilder()
 
-        builder.button(text='♦ Канал', url='https://t.me/')
-        builder.button(text='🪙 Выплаты', url='https://t.me/')
-        builder.button(text='🤳 Чат', url='https://t.me/')
-        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url='https://telegra.ph/SpotDice-resources-01-02'))
+        builder.button(text='♦ Канал', url='https://t.me/barrednews')
+        builder.button(text='🪙 Выплаты', url='https://t.me/spotdiceV')
+        builder.button(text='🤳 Чат', url='https://t.me/SpotDice')
+        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'))
 
         builder.adjust(2, 1, 1)
         return builder.as_markup()

@@ -10,7 +10,7 @@ async def add_player_move_if_not_moved(game: Game, player_telegram_id: int, move
 
 # Read
 async def get_game_moves(game: Game) -> list[PlayerScore]:
-    moves = await PlayerScore.filter(game=game).all()
+    moves = await PlayerScore.filter(game=game).prefetch_related('player').all()
     return moves
 
 

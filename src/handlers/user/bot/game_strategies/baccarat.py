@@ -238,10 +238,10 @@ class BaccaratStrategy(GameStrategy):
     @staticmethod
     async def start_game(bot: Bot, game: Game):
         """Когда все игроки собраны, вызывается функция для старта игры в баккара"""
-        time_on_move = 5*60
+        time_on_move = 10*60
         player_ids = await games.get_player_ids_of_game(game)
 
-        text = BaccaratMessages.get_bet_prompt()
+        text = BaccaratMessages.get_game_started()
         counter_text = "⏱ Время на ход: {0}"
         reply_markup = BaccaratKeyboards.get_bet_options()
 
@@ -313,12 +313,18 @@ class BaccaratStrategy(GameStrategy):
         bet_choices = await game_scores.get_game_moves(game)
 
         for choice in bet_choices:
+            player_id = choice.player.telegram_id
+
             if choice.value == won_option.value:
+                win_amount = game.bet * win_coefficient
                 await transactions.accrue_winnings(
                     game_category=game.category,
                     winner_telegram_id=(await choice.player.get()).telegram_id,
-                    amount=game.bet * win_coefficient
+                    amount=win_amount
                 )
+                await bot.send_message(chat_id=player_id, text=BaccaratMessages.get_player_won(win_amount=win_amount))
+            else:
+                await bot.send_message(chat_id=player_id, text=BaccaratMessages.get_player_loose())
 
         await send_result_to_players(bot, game, bet_choices)
         await game_scores.delete_game_scores(game)

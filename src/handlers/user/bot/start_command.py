@@ -71,16 +71,6 @@ async def handle_empty_start_cmd(message: Message):
     # отправляем приветствие
     await send_welcome(message)
 
-
-    from src.database import bands
-    from src.misc.enums.leagues import BandLeague
-    from src.utils.draw_bands_map import draw_bands_map
-    top_league_bands = await bands.get_bands_rating_in_league(league=BandLeague.GAMBLERS, count=6)
-    band_names = [band.title for band in top_league_bands]
-
-    map_photo = draw_bands_map(band_names, BandLeague.GAMBLERS)
-    map_message = await message.bot.send_photo(photo=map_photo, chat_id=1136918511)
-
     if created_user:
         await send_user_agreement(to_message=message)
 

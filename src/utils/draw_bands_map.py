@@ -63,7 +63,6 @@ def draw_bands_map(band_names: list[str], band_league: BandLeague) -> BufferedIn
         draw = ImageDraw.Draw(bands_map)
 
         for band_name, position in zip(band_names, get_positions(band_league)):
-            print(band_name, position)
             font_size = 70
             font = ImageFont.truetype("resources/fonts/font.otf", size=font_size)
 

@@ -130,7 +130,7 @@ class BlackJackStrategy(GameStrategy):
         else:
             caption_text = timer_text
 
-        time_on_move = 5*60
+        time_on_move = 10*60
         result_photo_msg = await bot.send_photo(
             chat_id=player_id, photo=photo, reply_markup=markup,
             caption=caption_text.format(BlackJackTimer.format_seconds_to_time(time_on_move))
@@ -199,9 +199,9 @@ class BlackJackStrategy(GameStrategy):
             text = BlackJackMessages.get_player_won(
                 player_name=player_name, win_amount=result.winnings.get(player_id)
             )
-        # Если есть среди тех, у кого ничья
-        elif player_id in result.ties:
-            text = BlackJackMessages.get_tie()
+        # # Если есть среди тех, у кого ничья
+        # elif player_id in result.ties:
+        #     text = BlackJackMessages.get_tie()
         # Если won_players пуст, то устанавливаем текст о победе дилера
         elif len(result.winnings) == 0:
             text = BlackJackMessages.get_dealer_won()
