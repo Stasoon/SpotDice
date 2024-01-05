@@ -60,7 +60,7 @@ class BaccaratMessages(CreatableGamesMessages, BotGamesMessagesBase):
     async def get_baccarat_results(bet_choices: Collection[PlayerScore]):
         text = 'Результаты \n\n'
         for choice in bet_choices:
-            text += f'{await choice.player.get()} — '
+            text += f'{choice.player} — '
             match choice.value:
                 case BaccaratBettingOption.PLAYER.value:
                     text += 'игрок \n'

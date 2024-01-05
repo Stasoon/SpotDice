@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -76,6 +76,14 @@ async def handle_cancel_deposit(message: Message, state: FSMContext):
 async def handle_deposit_callback(callback: CallbackQuery):
     """Показывает сообщение с методами пополнения"""
     await callback.message.edit_text(
+        text=UserPaymentMessages.get_choose_deposit_method(),
+        reply_markup=UserPaymentKeyboards.get_deposit_methods(),
+        parse_mode='HTML'
+    )
+
+
+async def handle_deposit_command(message: Message):
+    await message.answer(
         text=UserPaymentMessages.get_choose_deposit_method(),
         reply_markup=UserPaymentKeyboards.get_deposit_methods(),
         parse_mode='HTML'
@@ -221,6 +229,7 @@ def register_deposit_handlers(router: Router):
         handle_deposit_callback,
         MenuNavigationCallback.filter((F.branch == 'profile') & (F.option == 'deposit'))
     )
+    router.message.register(handle_deposit_command, Command('deposit'))
 
     # нажатие на метод пополнения
     router.callback_query.register(handle_show_deposit_method_callbacks, DepositCallback.filter(~F.currency))

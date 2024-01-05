@@ -27,3 +27,5 @@ def get_message_instance_by_game_type(game_type: GameType):
             return FootballMessages
         case GameType.BOWLING:
             return BowlingMessages
+        case _:
+            return UserPrivateGameMessages

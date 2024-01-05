@@ -9,7 +9,8 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages):
 
     @staticmethod
     def get_game_created(game_number: int):
-        pass
+        return f'♠ Супер, игра №{game_number} создана! \n\n' \
+               f'Скоро к тебе за стол сядет и другой гость нашего заведения. Удачи!'
 
     @staticmethod
     def get_category_description(player_name: str) -> str:

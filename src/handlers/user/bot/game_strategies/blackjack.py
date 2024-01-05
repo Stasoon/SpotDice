@@ -161,7 +161,7 @@ class BlackJackStrategy(GameStrategy):
             if player_score.value > 21:
                 continue
 
-            player_id = (await player_score.player.get()).telegram_id
+            player_id = player_score.player.telegram_id
             # обычный выигрыш
             if player_score.value > dealer_points or dealer_points > 21:
                 amount = await transactions.accrue_winnings(

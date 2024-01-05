@@ -319,7 +319,7 @@ class BaccaratStrategy(GameStrategy):
                 win_amount = game.bet * win_coefficient
                 await transactions.accrue_winnings(
                     game_category=game.category,
-                    winner_telegram_id=(await choice.player.get()).telegram_id,
+                    winner_telegram_id=choice.player.telegram_id,
                     amount=win_amount
                 )
                 await bot.send_message(chat_id=player_id, text=BaccaratMessages.get_player_won(win_amount=win_amount))

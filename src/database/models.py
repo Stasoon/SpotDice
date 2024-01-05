@@ -140,7 +140,8 @@ class EvenUnevenPlayerBet(Model):
 
 # region Transactions
 
-class Bonus(Model):
+class PromoCode(Model):
+    id = fields.IntField(pk=True, generated=True)
     amount = fields.DecimalField(max_digits=6, decimal_places=2)
     activation_code = fields.CharField(max_length=25, unique=True)
     total_activations_count = fields.IntField(default=100)  # общее количество активаций
@@ -149,12 +150,12 @@ class Bonus(Model):
     is_active = fields.BooleanField(default=True)
 
     class Meta:
-        table = "bonuses"
+        table = "promo_codes"
 
 
 class BonusActivation(Model):
     user = fields.ForeignKeyField('models.User', related_name='bonus_activations')
-    bonus = fields.ForeignKeyField('models.Bonus', related_name='activations')
+    bonus = fields.ForeignKeyField('models.PromoCode', related_name='activations')
 
 
 class ReferralBonus(Model):

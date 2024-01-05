@@ -106,3 +106,8 @@ class AdminValidatePaymentCallback(CallbackData, prefix='confirm_payment'):
 class ReferralLinkCallback(CallbackData, prefix='referral_link'):
     action: str
     link_id: Optional[int] = None
+
+
+class PromoCodeCallback(CallbackData, prefix=''):
+    promo_code_id: int
+    action: str

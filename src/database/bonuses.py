@@ -4,7 +4,7 @@ from decimal import Decimal
 
 from tortoise.exceptions import IntegrityError
 
-from .models import Bonus, BonusActivation, User
+from .models import PromoCode, BonusActivation, User
 
 
 def __generate_activation_code(length=8):
@@ -15,7 +15,7 @@ def __generate_activation_code(length=8):
 
 
 # Create
-async def create_bonus(amount: float, activations_count: int = 50, activation_code: str = None) -> Bonus | None:
+async def create_bonus(amount: float, activations_count: int = 50, activation_code: str = None) -> PromoCode | None:
     """Создать новый бонус. Если activation_code не указано, будет сгенерирован рандомно."""
     amount = Decimal(amount)
 
@@ -23,13 +23,14 @@ async def create_bonus(amount: float, activations_count: int = 50, activation_co
     if not activation_code:
         # Создаём новый код до тех пор, пока он будет не занят
         while True:
-            activation_code = __generate_activation_code()
-            if await is_activation_code_not_occupied(activation_code):
+            code = __generate_activation_code()
+            if not await is_activation_code_not_occupied(activation_code):
+                activation_code = code
                 break
 
     # Пытаемся создать бонус
     try:
-        bonus = await Bonus.create(
+        bonus = await PromoCode.create(
             amount=amount, activation_code=activation_code,
             total_activations_count=activations_count,
             remaining_activations_count=activations_count
@@ -42,15 +43,19 @@ async def create_bonus(amount: float, activations_count: int = 50, activation_co
 
 # Read
 async def is_activation_code_not_occupied(code_to_check) -> bool:
-    return await Bonus.filter(activation_code=code_to_check).exists()
+    return await PromoCode.filter(activation_code=code_to_check).exists()
 
 
-async def get_bonus_by_activation_code_or_none(code: str) -> Bonus | None:
-    return await Bonus.get_or_none(activation_code=code)
+async def get_bonus_by_activation_code_or_none(code: str) -> PromoCode | None:
+    return await PromoCode.get_or_none(activation_code=code)
 
 
-async def get_active_bonuses() -> list[Bonus]:
-    return await Bonus.filter(is_active=True).all()
+async def get_bonus_by_id_or_none(promo_code_id: int):
+    return await PromoCode.get_or_none(id=promo_code_id)
+
+
+async def get_active_bonuses() -> list[PromoCode]:
+    return await PromoCode.filter(is_active=True).all()
 
 
 # Update
@@ -60,7 +65,7 @@ async def is_user_activated_bonus(bonus, user):
     return await BonusActivation.filter(user=user, bonus=bonus).exists()
 
 
-async def make_activation(bonus: Bonus, user: User) -> bool:
+async def make_activation(bonus: PromoCode, user: User) -> bool:
     if not bonus.is_active:
         return False
 
@@ -83,6 +88,6 @@ async def make_activation(bonus: Bonus, user: User) -> bool:
     return False
 
 
-async def deactivate_bonus(bonus: Bonus):
+async def deactivate_promo_code(bonus: PromoCode):
     bonus.is_active = False
     await bonus.save()

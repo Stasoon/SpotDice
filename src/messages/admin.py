@@ -3,7 +3,7 @@ from typing import Literal
 
 from aiogram import html
 
-from src.database.models import Bonus, ReferralLink
+from src.database.models import PromoCode, ReferralLink
 from src.misc import WithdrawMethod, DepositMethod
 from src.utils.text_utils import format_float_to_rub_string
 
@@ -35,7 +35,7 @@ class AdminMessages:
                f'💵 Сумма: {format_float_to_rub_string(amount)}'
 
     @staticmethod
-    def get_bonus_description(bonus: Bonus) -> str:
+    def get_bonus_description(bonus: PromoCode) -> str:
         text = (
             f'🎁 Бонус\n\n'
             f'Сумма: {format_float_to_rub_string(bonus.amount)} \n'

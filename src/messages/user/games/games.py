@@ -37,7 +37,7 @@ async def _get_players_results(game_moves: list[PlayerScore]) -> str:
     strings = []
 
     for move in game_moves:
-        strings.append(f"{str(await move.player.get())} - [{move.value}]")
+        strings.append(f"{move.player} - [{move.value}]")
 
     return '\n'.join(strings)
 
@@ -59,8 +59,12 @@ async def _get_game_participants(game: Game):
 # endregion Utils
 
 
-class UserPrivateGameMessages(CreatableGamesMessages):
+class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
     """Содержит функции для получения текстов сообщений, связанных с играми и отправляемых в боте"""
+
+    @staticmethod
+    def get_game_started():
+        return 'Игра началась!'
 
     @staticmethod
     def get_category_description(player_name: str) -> str:
@@ -105,7 +109,11 @@ class UserPrivateGameMessages(CreatableGamesMessages):
         user = await users.get_user_or_none(user_id)
 
         # Уникальный для игрового режима текст
-        game_type_unique_text = f"{message_instance.ask_for_bet_amount(user.name)}\n\n" if message_instance else ""
+        game_type_unique_text = (
+            f"{message_instance.ask_for_bet_amount(user.name)}\n\n"
+            if message_instance and message_instance.ask_for_bet_amount(user.name) is not None
+            else ""
+        )
 
         return f'➕ Создание игры в {game_type_name} \n\n' \
                f'{game_type_unique_text}'\
@@ -114,9 +122,8 @@ class UserPrivateGameMessages(CreatableGamesMessages):
                f'ℹ Введите размер ставки или нажмите Отмена'
 
     @staticmethod
-    def get_game_created(game: Game) -> str:
-        game_type = game.game_type
-        return f'✅ Игра {game_type.value} {game_type.get_full_name()} №{game.number} создана. \n\n' \
+    def get_game_created(game_number: int) -> str:
+        return f'✅ Игра №{game_number} создана. \n\n' \
                f'⏰ Скоро кто-то присоединится...'
 
     @staticmethod

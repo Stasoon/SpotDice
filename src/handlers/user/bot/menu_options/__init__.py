@@ -9,8 +9,8 @@ from .bands import register_bands_handlers
 
 
 def register_menu_options_handlers(router: Router):
-    register_play_handlers(router)
     register_profile_handlers(router)
+    register_play_handlers(router)
     register_info_handlers(router)
     register_top_players_handlers(router)
     register_events_handlers(router)

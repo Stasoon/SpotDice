@@ -74,7 +74,6 @@ def draw_bands_map(band_names: list[str], band_league: BandLeague) -> BufferedIn
             )
 
         img_buffer = io.BytesIO()
-        bands_map.save(f'{band_league}.png')
         bands_map.save(img_buffer, format='PNG')
 
         image_bytes = img_buffer.getvalue()

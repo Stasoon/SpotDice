@@ -36,8 +36,7 @@ class BasicGameStrategy(GameStrategy):
     async def __make_refund_for_tie(game: Game, game_moves: list[PlayerScore]) -> None:
         # Возвращаем деньги участникам
         for move in game_moves:
-            player = await move.player.get()
-            await transactions.make_bet_refund(game=game, player_id=player.telegram_id, amount=game.bet)
+            await transactions.make_bet_refund(game=game, player_id=move.player.telegram_id, amount=game.bet)
 
     @staticmethod
     async def __accrue_players_winnings_and_get_amount(game: Game, win_coefficient: float, winners: list[User]) -> float:
@@ -66,16 +65,15 @@ class BasicGameStrategy(GameStrategy):
         msg_instance = get_message_instance_by_game_type(game_type=game.game_type)
         tie_text = msg_instance.get_tie() if not winners else None
         for move in game_moves:
-            player = (await move.player.get())
             if tie_text:
                 message_text = tie_text
-            elif player in winners:
-                message_text = msg_instance.get_player_won(player_name=player.name, win_amount=winning_amount)
+            elif move.player in winners:
+                message_text = msg_instance.get_player_won(player_name=move.player.name, win_amount=winning_amount)
             else:
                 message_text = msg_instance.get_player_loose()
 
             if message_text:
-                await bot.send_message(chat_id=player.telegram_id, text=message_text)
+                await bot.send_message(chat_id=move.player.telegram_id, text=message_text)
 
     @classmethod
     async def finish_game(cls, bot: Bot, game: Game):
@@ -96,7 +94,7 @@ class BasicGameStrategy(GameStrategy):
             await cls.__make_refund_for_tie(game=game, game_moves=game_moves)
         else:  # значения разные (есть победитель)
             # формируем список победителей
-            winners = [await move.player.get() for move in game_moves if move.value == max_move.value]
+            winners = [await move.player for move in game_moves if move.value == max_move.value]
             # начисляем выигрыши
             winning_with_commission = await cls.__accrue_players_winnings_and_get_amount(
                 game=game, winners=winners, win_coefficient=win_coefficient)

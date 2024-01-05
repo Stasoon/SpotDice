@@ -89,11 +89,10 @@ async def finish_game(game: Game, message: Message):
     if all(move.value == max_move.value for move in game_moves):  # Если значения одинаковы (ничья)
         # Возвращаем деньги участникам
         for move in game_moves:
-            player = await move.player.get()
-            await transactions.make_bet_refund(player.telegram_id, game=game, amount=game.bet)
+            await transactions.make_bet_refund(move.player.telegram_id, game=game, amount=game.bet)
     else:  # значения разные
         # формируем список победителей
-        winners = [await move.player.get() for move in game_moves if move.value == max_move.value]
+        winners = [move.player for move in game_moves if move.value == max_move.value]
         # начисляем выигрыши
         winning_with_commission = await __accrue_players_winnings_and_get_amount(
             game=game, winners=winners, win_coefficient=win_coefficient)

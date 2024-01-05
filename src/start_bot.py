@@ -43,8 +43,6 @@ async def on_startup():
     asyncio.create_task(start_even_uneven_loop(bot, Config.Games.EVEN_UNEVEN_CHAT_ID))
 
     # Обновление картинок банд каждый час
-    # await save_maps_photos(bot=bot, chat_id=Config.Bands.maps_chat_id)
-    # await save_maps_photos(bot, Config.Bands.maps_chat_id)
     asyncio.create_task(run_periodic_maps_update(bot, Config.Bands.maps_chat_id))
 
     logger.info('Бот запущен!')
