@@ -92,3 +92,57 @@ class UserMenuMessages:
             f'➕ Пополнил:  {format_float_to_rub_string(await transactions.get_user_all_deposits_sum(user))} \n'
             f'➖ Вывел:  {format_float_to_rub_string(await transactions.get_user_all_withdraws_sum(user))} \n'
         )
+
+    @staticmethod
+    def get_help() -> str:
+        return """
+Доступные команды ❔
+
+Чат нашего заведения: @SpotDice
+  
+👤 Игры на двоих:
+
+🏀 /basket [сумма] 
+🎲 /dice [сумма]
+🎯 /darts [сумма]  
+🎰 /slots [сумма]
+🎳 /bowl [сумма]
+⚽️ /foot [сумма]
+
+👥 Игры на троих:
+
+🏀 /basket3 [сумма]
+🎲 /dice3 [сумма] 
+🎯 /darts3 [сумма] 
+🎰 /slots3 [сумма]
+🎳 /bowl3 [сумма]
+⚽️ /foot3 [сумма]
+
+
+💣 Мини-игры
+🎲 /cube [сумма] [число от 1-6]
+🎰 /casino [сумма]
+
+Карточные игры: 
+♠️ BlackJack — /bj [ставка]
+
+🎴 Baccarat — /baccarat [ставка]
+
+🎱 Игры можно создавать в любой беседе, где есть наш бот. Добавляй в чат с друзьями
+
+Погрузиться во всю историю тебе помогут статьи BarredNews: 
+
+— О том, как же устроен город читай в этой <a href="https://telegra.ph/Pravila-Goroda-01-04">новостной сводке</a>. 
+
+— Про систему лиг читай подробнее в этой <a href="https://telegra.ph/Pravila-lig-01-04">новостной сводке</a>.
+
+— Про то, как работают банды читай в этой <a href="https://telegra.ph/Kak-zhe-rabotayut-Bandy-01-04">новостной сводке</a>.
+
+
+💡Другие команды
+
+❌ /del [ответ на режим] - Удалить игру
+🔍 /all games -  Активные игры чата
+🗂  /my games - Ваши незавершенные игры
+🪪  /profile  - Отображает информацию чате
+"""

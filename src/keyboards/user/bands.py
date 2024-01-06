@@ -14,16 +14,16 @@ class BandsKeyboards:
     @staticmethod
     def get_bands_menu(user_band: Band = None) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
+
+        builder.button(text='ℹ Информация', callback_data=MenuNavigationCallback(branch='bands', option='info'))
+        builder.button(text='🏙 Город', callback_data=MenuNavigationCallback(branch='bands', option='city'))
         if not user_band:
             builder.button(
-                text='➕ Создать свою банду ➕', callback_data=MenuNavigationCallback(branch='bands', option='create')
+                text='➕ Создать свою банду', callback_data=MenuNavigationCallback(branch='bands', option='create')
             )
         else:
             builder.button(text=f"Ваша банда: {user_band.title}", callback_data=BandCallback(band_id=user_band.id))
-
-        builder.button(text='🏙 Город', callback_data=MenuNavigationCallback(branch='bands', option='city'))
         builder.button(text='📊 Рейтинг', callback_data=MenuNavigationCallback(branch='bands', option='rating'))
-        builder.button(text='ℹ Информация', callback_data=MenuNavigationCallback(branch='bands', option='info'))
         builder.adjust(1)
         return builder.as_markup()
 
@@ -95,7 +95,10 @@ class BandsKeyboards:
 
         for band in bands:
             star_text = "✴ " if band == user_band else ""
-            builder.button(text=f"{star_text}{band.title} - 💰 {float(band.score)}", callback_data="*")
+            builder.button(
+                text=f"{star_text}{band.title} - 💰 {float(band.score)}",
+                url=str(band.creator.get_mention_url())
+            )
         builder.button(text="🔙 Назад", callback_data=BandCallback(band_id=user_band.id))
 
         builder.adjust(1)

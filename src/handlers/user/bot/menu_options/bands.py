@@ -286,7 +286,7 @@ async def handle_rating_callback(callback: CallbackQuery):
     user_band_rank = await bands.get_band_rating_position(target_band=user_band)
     markup = BandsKeyboards.get_global_rating(bands_rating, user_band, user_band_rank)
 
-    await callback.message.edit_text(text='Рейтинг банд', reply_markup=markup)
+    await callback.message.edit_text(text='📊 Рейтинг банд', reply_markup=markup)
 
 
 # ГОРОД
@@ -317,7 +317,7 @@ async def handle_band_map_callback(callback: CallbackQuery, callback_data: Bands
 # ИНФОРМАЦИЯ
 
 async def handle_info_callback(callback: CallbackQuery):
-    await callback.message.edit_text(text='Информация о бандах', reply_markup=BandsKeyboards.get_info())
+    await callback.message.edit_text(text='ℹ Информация о бандах', reply_markup=BandsKeyboards.get_info())
 
 
 async def handle_info_article_callback(callback: CallbackQuery, callback_data: MenuNavigationCallback):

@@ -90,7 +90,7 @@ async def handle_start_to_show_game_cmd(message: Message, command: CommandObject
     game = await games.get_game_obj(game_number)
 
     if not game or game.status != GameStatus.WAIT_FOR_PLAYERS:
-        await message.answer(GameErrors.get_game_is_finished(), parse_mode='HTML')
+        await message.answer(text=GameErrors.get_game_is_finished(), reply_markup=UserMenuKeyboards.get_main_menu())
         return
 
     await message.answer(

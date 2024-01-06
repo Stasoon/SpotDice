@@ -5,6 +5,7 @@ from src.database import PlayerScore
 from src.messages.user.games.creatable_game_messages_base import CreatableGamesMessages
 from src.messages.user.games.game_messages_base import BotGamesMessagesBase
 from src.misc.enums import BaccaratBettingOption
+from src.utils.text_utils import format_float_to_rub_string
 
 
 class BaccaratMessages(CreatableGamesMessages, BotGamesMessagesBase):
@@ -28,7 +29,7 @@ class BaccaratMessages(CreatableGamesMessages, BotGamesMessagesBase):
             'DICY: Твоя ставка оказалась выигрышной! Скорее бери свой выигрыш {win_amount}',
             'DICY: Поздравляю с победой, ты сделал правильную ставку. Бери свой выигрыш {win_amount}',
         )
-        return random.choice(texts).format(win_amount=win_amount)
+        return random.choice(texts).format(win_amount=format_float_to_rub_string(win_amount))
 
     @staticmethod
     def get_player_loose():

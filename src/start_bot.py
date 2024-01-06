@@ -22,6 +22,7 @@ async def set_bot_commands():
             BotCommand(command='profile', description='Информация о профиле'),
             BotCommand(command='mygames', description='Мои незавершённые игры'),
             BotCommand(command='allgames', description='Незавершённые игры чата'),
+            BotCommand(command='help', description='Помощь'),
         ]
     )
 

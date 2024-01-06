@@ -1,10 +1,12 @@
 from aiogram import Router, F
+from aiogram.enums import ChatType
 from aiogram.types import Message, CallbackQuery
 from aiogram.filters.command import Command, CommandObject
 
 from src.database.transactions import deposit_to_user
 from src.database import bonuses
 from src.database.users import get_user_or_none
+from src.filters import ChatTypeFilter
 from src.keyboards.admin.promocodes_kbs import PromoCodesKbs
 from src.messages import AdminMessages
 from src.misc.callback_factories import PromoCodeCallback
@@ -87,7 +89,7 @@ async def handle_deactivate_promo_code_callback(callback: CallbackQuery, callbac
 
 
 def register_commands_handlers(router: Router):
-    router.message.register(handle_help_command, Command('help'))
+    router.message.register(handle_help_command, Command('help'), ChatTypeFilter(chat_type=ChatType.PRIVATE))
 
     router.message.register(handle_give_balance_command, Command('give', 'dep'))
 

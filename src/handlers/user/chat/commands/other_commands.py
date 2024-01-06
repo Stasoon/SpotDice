@@ -63,8 +63,13 @@ async def handle_delete_game_command(message: Message):
     await check_rights_and_cancel_game(event=message, game=game)
 
 
+async def handle_help_command(message: Message):
+    await message.answer(text=UserMenuMessages.get_help())
+
+
 def register_other_commands_handlers(router: Router):
     router.message.register(handle_delete_game_command, Command('del'))
     router.message.register(handle_profile_command, Command('profile'))
     router.message.register(handle_all_games_command, Command('allgames'))
     router.message.register(handle_my_games_command, Command('mygames'))
+    router.message.register(handle_help_command, Command('help'))

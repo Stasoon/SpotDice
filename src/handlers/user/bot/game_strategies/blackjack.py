@@ -139,7 +139,8 @@ class BlackJackStrategy(GameStrategy):
         timer = BlackJackTimer(
             bot=bot, game_number=game.number,
             chat_id=player_id, message_id=result_photo_msg.message_id,
-            text_template=caption_text, markup=markup
+            text_template=caption_text, markup=markup,
+            seconds_expiry=time_on_move
         )
         await timer.start()
 
@@ -164,6 +165,7 @@ class BlackJackStrategy(GameStrategy):
             player_id = player_score.player.telegram_id
             # обычный выигрыш
             if player_score.value > dealer_points or dealer_points > 21:
+                print('выиг', player_score.value, dealer_points)
                 amount = await transactions.accrue_winnings(
                     game_category=game.category, winner_telegram_id=player_id, amount=game.bet * 2
                 )
@@ -189,19 +191,25 @@ class BlackJackStrategy(GameStrategy):
     @staticmethod
     async def __get_result_text(result: BlackJackResult, player_id):
         text = None  # Инициализируем переменную text для каждого игрока
-
-        # Если нет в победителях
-        if player_id not in result.winnings:
-            text = BlackJackMessages.get_player_loose()
+        print(result.__dict__)
         # Если есть в победителях
-        elif player_id in result.winnings:
+        if player_id in result.winnings:
             player_name = (await users.get_user_or_none(telegram_id=player_id)).name
             text = BlackJackMessages.get_player_won(
                 player_name=player_name, win_amount=result.winnings.get(player_id)
             )
-        # # Если есть среди тех, у кого ничья
-        # elif player_id in result.ties:
-        #     text = BlackJackMessages.get_tie()
+        # Все проиграли
+        elif len(result.winnings) == 0 and len(result.ties) == 0:
+            text = BlackJackMessages.get_global_loose()
+        # Если у всех ничья
+        elif len(result.winnings) == 0 and len(result.ties) > 0:
+            text = BlackJackMessages.get_global_tie()
+        # Если нет в победителях (победил другой игрок)
+        elif player_id not in result.winnings:
+            text = BlackJackMessages.get_player_loose()
+        # Если игрок среди тех, у кого ничья
+        elif player_id in result.ties:
+            text = BlackJackMessages.get_tie()
         # Если won_players пуст, то устанавливаем текст о победе дилера
         elif len(result.winnings) == 0:
             text = BlackJackMessages.get_dealer_won()

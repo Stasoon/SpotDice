@@ -102,8 +102,11 @@ async def get_band_rating_position(target_band: Band) -> int | None:
 
 async def get_band_opponents(player_band: Band, count_before: int = 4, count_after: int = 2) -> list[Band]:
     # Получаем банды соперников до и после банды игрока
-    opponents_after = await Band.filter(score__lt=player_band.score).order_by('-score').limit(count_before)
-    opponents_before = await Band.filter(score__gt=player_band.score).order_by('-score').limit(count_after)
+    opponents_after = await Band.filter(score__lte=player_band.score).order_by('-score').limit(count_before).prefetch_related('creator')
+    opponents_before = await Band.filter(score__gt=player_band.score).order_by('-score').limit(count_after).prefetch_related('creator')
+
+    if player_band in opponents_after:
+        opponents_after.remove(player_band)
 
     return sorted(opponents_before + [player_band] + opponents_after, key=lambda x: x.score, reverse=True)
 

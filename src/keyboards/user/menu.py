@@ -91,7 +91,7 @@ class UserMenuKeyboards:
 
         builder.button(text='♦ Канал', url='https://t.me/barrednews')
         builder.button(text='🪙 Выплаты', url='https://t.me/spotdiceV')
-        builder.button(text='🤳 Чат', url='https://t.me/SpotDice')
+        builder.button(text='⭐ ЧАТ', url='https://t.me/SpotDice')
         builder.button(text='📃 Соглашение', web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'))
 
         builder.adjust(2, 1, 1)

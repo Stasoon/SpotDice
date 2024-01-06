@@ -29,6 +29,10 @@ async def add_user_to_bot_game(callback: CallbackQuery, game: Game):
                 strategy = BlackJackStrategy
 
         if strategy:
+            try:
+                await callback.bot.delete_message(chat_id=game.chat_id, message_id=game.message_id)
+            except Exception:
+                pass
             await strategy.start_game(callback.bot, game)
 
 
