@@ -20,6 +20,14 @@ class UserMenuKeyboards:
         )
         return builder.as_markup()
 
+    @staticmethod
+    def get_need_to_subscribe(url: str) -> InlineKeyboardMarkup:
+        builder = InlineKeyboardBuilder()
+        builder.button(text='Канал', url=url)
+        builder.button(text='Проверить', callback_data='check_subscribe')
+        builder.adjust(1)
+        return builder.as_markup()
+
     # branch MAIN
     @staticmethod
     def get_main_menu() -> ReplyKeyboardMarkup:

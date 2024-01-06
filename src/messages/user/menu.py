@@ -94,6 +94,18 @@ class UserMenuMessages:
         )
 
     @staticmethod
+    def get_promo_activated(bonus_amount: float) -> str:
+        texts = (
+            'DICY: Эй, новичок, пришел испытать удачу? \n\nВот твои {amount}, хватит на первую попытку.',
+            'DICY: Новый игрок в нашем заведении! \n\nЧтобы было легче начать – держи {amount}',
+            'DICY: Добрый день, уважаемый игрок. \n\nПолучите положенные вам {amount}. Приятной игры!',
+            'DICY: Каждый с чего-то начинал. \n\nЭти {amount} помогут тебе сделать первый шаг к титулу Короля Азарта!',
+            'DICY: Это только {amount}, но в будущем ты сделаешь из них гораздо больше. \n\nУдачи!',
+            'Уже не терпится вступить в гонку за богатство и власть? \n\nПусть эти {amount} будут для тебя лучшим стартовым трамплином!',
+        )
+        return random.choice(texts).format(amount=format_float_to_rub_string(bonus_amount))
+
+    @staticmethod
     def get_help() -> str:
         return """
 Доступные команды ❔

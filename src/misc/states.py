@@ -11,6 +11,10 @@ class AdminStates:
         wait_for_name = State()
 
 
+class CheckSubscribeStates(StatesGroup):
+    wait_for_check = State()
+
+
 class BandCreationStates(StatesGroup):
     enter_band_title = State()
 

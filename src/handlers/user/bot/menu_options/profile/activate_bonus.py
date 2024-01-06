@@ -1,7 +1,7 @@
 import asyncio
 
 from aiogram import Router, F
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -31,6 +31,13 @@ async def handle_activate_bonus_callback(callback: CallbackQuery, state: FSMCont
     await state.set_state(ActivateBonusStates.wait_for_code)
 
 
+async def handle_activate_bonus_command(message: Message, state: FSMContext):
+    await message.answer(
+        text='<b>✍🏻 Введите ваш промокод:</b>', reply_markup=UserMenuKeyboards.get_cancel_reply()
+    )
+    await state.set_state(ActivateBonusStates.wait_for_code)
+
+
 async def handle_bonus_code_message(message: Message, state: FSMContext):
     bonus = await bonuses.get_bonus_by_activation_code_or_none(code=message.text)
     user = await users.get_user_or_none(telegram_id=message.from_user.id)
@@ -50,7 +57,7 @@ async def handle_bonus_code_message(message: Message, state: FSMContext):
     else:
         await bonuses.make_activation(bonus=bonus, user=user)
         await message.answer(
-            text=f'🎊 Бонус в {format_float_to_rub_string(bonus.amount)} активирован!',
+            text=UserMenuMessages.get_promo_activated(bonus.amount),
             reply_markup=UserMenuKeyboards.get_main_menu()
         )
 
@@ -73,5 +80,6 @@ def register_activate_bonus_handlers(router: Router):
         handle_activate_bonus_callback,
         MenuNavigationCallback.filter((F.branch == 'profile') & (F.option == 'bonus'))
     )
+    router.message.register(handle_activate_bonus_command, Command('promo'))
 
     router.message.register(handle_bonus_code_message, ActivateBonusStates.wait_for_code)

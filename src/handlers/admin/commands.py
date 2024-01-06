@@ -6,7 +6,7 @@ from aiogram.filters.command import Command, CommandObject
 from src.database.transactions import deposit_to_user
 from src.database import bonuses
 from src.database.users import get_user_or_none
-from src.filters import ChatTypeFilter
+from src.filters import ChatTypeFilter, IsAdminFilter
 from src.keyboards.admin.promocodes_kbs import PromoCodesKbs
 from src.messages import AdminMessages
 from src.misc.callback_factories import PromoCodeCallback
@@ -22,7 +22,7 @@ async def handle_help_command(message: Message):
         "<code>/give</code> {id} {сумма}  -  пополнить баланс \n"
         "<code>/dep</code> {id} {сумма}  -  пополнить баланс с уведомлением \n\n"
         "Промокоды: \n"
-        "<code>/promo</code> {сумма} {кол-во активаций} {код}  -  создать \n"
+        "<code>/promocode</code> {сумма} {кол-во активаций} {код}  -  создать \n"
         "<code>/promos</code>  -  посмотреть список"
     )
 
@@ -63,7 +63,7 @@ async def handle_promo_code_command(message: Message, command: CommandObject):
         return
 
     bonus = await bonuses.create_bonus(
-        amount=amount, activations_count=activations_count, activation_code=activation_code
+        amount=amount, activations_count=activations_count if activations_count else 50, activation_code=activation_code
     )
     await message.answer(text=AdminMessages.get_bonus_description(bonus=bonus))
 
@@ -89,10 +89,10 @@ async def handle_deactivate_promo_code_callback(callback: CallbackQuery, callbac
 
 
 def register_commands_handlers(router: Router):
-    router.message.register(handle_help_command, Command('help'), ChatTypeFilter(chat_type=ChatType.PRIVATE))
+    router.message.register(handle_help_command, Command('help'), IsAdminFilter(True), ChatTypeFilter(chat_type=ChatType.PRIVATE))
 
-    router.message.register(handle_give_balance_command, Command('give', 'dep'))
+    router.message.register(handle_give_balance_command, Command('give', 'dep'), IsAdminFilter(True))
 
-    router.message.register(handle_promo_code_command, Command('promo'))
-    router.message.register(handle_promo_codes_command, Command('promos'))
-    router.callback_query.register(handle_deactivate_promo_code_callback, PromoCodeCallback.filter(F.action == 'deactivate'))
+    router.message.register(handle_promo_code_command, Command('promocode'), IsAdminFilter(True))
+    router.message.register(handle_promo_codes_command, Command('promos'), IsAdminFilter(True))
+    router.callback_query.register(handle_deactivate_promo_code_callback, IsAdminFilter(True), PromoCodeCallback.filter(F.action == 'deactivate'))

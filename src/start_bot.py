@@ -14,7 +14,12 @@ from src.utils.send_league_updated import send_league_updated
 
 
 async def set_bot_commands():
-    await bot.set_my_commands(commands=[BotCommand(command='start', description='Запуск бота')])
+    await bot.set_my_commands(
+        commands=[
+            BotCommand(command='start', description='Запуск бота'),
+            BotCommand(command='promo', description='Активировать промокод')
+        ]
+    )
 
     await bot.set_my_commands(
         scope=BotCommandScopeAllGroupChats(),

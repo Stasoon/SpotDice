@@ -2,7 +2,7 @@ from aiogram import F, Router
 from aiogram.filters import CommandStart
 from aiogram.filters.command import CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message
+from aiogram.types import Message, CallbackQuery
 
 from src.handlers.user.bot import even_uneven
 from src.handlers.user.bot.menu_options.bands import show_band_to_join
@@ -17,12 +17,18 @@ from src.misc import GameStatus
 # region Utils
 
 
-async def send_welcome(start_message: Message):
+async def send_welcome(start_message: Message, with_menu: bool = True):
     await start_message.answer_sticker(
-        # text=UserMenuMessages.get_welcome(start_message.from_user.first_name),
         sticker=UserMenuMessages.get_welcome_sticker(),
-        reply_markup=UserMenuKeyboards.get_main_menu(),
-        parse_mode='HTML'
+        reply_markup=UserMenuKeyboards.get_main_menu()
+    )
+
+
+async def send_need_to_subscribe(to_message: Message):
+    channel_url = ''
+    await to_message.answer(
+        text='Чтобы начать пользоваться ботом, подпишитесь на канал',
+        reply_markup=UserMenuKeyboards.get_need_to_subscribe(url=channel_url)
     )
 
 
@@ -72,7 +78,11 @@ async def handle_empty_start_cmd(message: Message):
     await send_welcome(message)
 
     if created_user:
+        # await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker())
         await send_user_agreement(to_message=message)
+        # await message.answer(
+        #     text='Подпишитесь', reply_markup=UserMenuKeyboards.get_need_to_subscribe(url='https://t.me/')
+        # )
 
 
 async def handle_promotion_link_start_cmd(message: Message, command: CommandObject):
@@ -113,6 +123,20 @@ async def handle_join_band(message: Message, command: CommandObject):
     await show_band_to_join(bot=message.bot, user_id=message.from_user.id, band_id=band_id)
 
 
+async def handle_check_subscribed_callback(callback: CallbackQuery):
+    member = None
+    try:
+        await callback.bot.get_chat_member(chat_id=1, user_id=callback.from_user.id)
+    except Exception:
+        await callback.answer('Вы не подписались!')
+
+    print(member)
+    if not member:
+        await callback.answer('Вы не подписались!')
+    else:
+        await callback.message.delete()
+
+
 # endregion
 
 
@@ -136,5 +160,7 @@ def register_start_command_handler(router: Router):
 
     # Пустая команда /start
     router.message.register(handle_empty_start_cmd, CommandStart(deep_link=False))
+
+    router.callback_query.register(handle_check_subscribed_callback, F.data == 'check_subscribe')
 
 
