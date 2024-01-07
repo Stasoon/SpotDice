@@ -2,6 +2,7 @@ from aiogram.types import WebAppInfo
 from aiogram.utils.keyboard import (InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton,
                                     ReplyKeyboardMarkup, InlineKeyboardBuilder)
 
+
 from src.misc import MenuNavigationCallback
 
 

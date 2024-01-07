@@ -1,9 +1,9 @@
 from aiogram import F, Router
 from aiogram.enums import ChatMemberStatus
-from aiogram.filters import CommandStart, ChatMemberUpdatedFilter, MEMBER, RESTRICTED, LEFT, KICKED
+from aiogram.filters import CommandStart
 from aiogram.filters.command import CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ChatMemberUpdated
+from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
 from src.handlers.user.bot import even_uneven
 from src.handlers.user.bot.menu_options.bands import show_band_to_join
@@ -27,14 +27,8 @@ async def send_welcome(start_message: Message):
 
 
 async def send_user_agreement(to_message: Message):
-    member = await to_message.bot.get_chat_member(chat_id=-1001947654963, user_id=to_message.from_user.id)
-
-    if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR]:
-        markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/barrednews')
-        text = UserMenuMessages.get_need_sub()
-    else:
-        markup = UserMenuKeyboards.get_user_agreement()
-        text = None
+    markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/barrednews')
+    text = UserMenuMessages.get_need_sub()
 
     await to_message.answer_animation(
         animation=UserMenuMessages.get_user_agreement_animation(),
@@ -70,33 +64,28 @@ async def handle_start_cmd_with_user_referral_link(message: Message, command: Co
     # если пользователь зашёл впервые - обрабатываем реферальную ссылку
     command_args = command.args.replace('ref', '')
     if created_user:
-        await send_user_agreement(to_message=message)
         await process_referral_code_arg(command_args, message.from_user.id)
-    else:
-        await send_welcome(message)
-        await send_user_agreement(to_message=message)
+
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
+    await send_user_agreement(to_message=message)
 
 
-async def handle_empty_start_cmd(message: Message, state: FSMContext):
+async def handle_empty_start_cmd(message: Message):
     # создаём пользователя, если не существует
     created_user = await create_user(message.from_user)
 
-    if created_user:
-        await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker())
-        await send_user_agreement(to_message=message)
-        await state.set_state(CheckSubscribeStates.wait_for_check)
-    else:
-        await send_welcome(message)
-        await send_user_agreement(to_message=message)
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
+    await send_user_agreement(to_message=message)
 
 
 async def handle_promotion_link_start_cmd(message: Message, command: CommandObject):
     created_user = await create_user(message.from_user)
-    await send_welcome(message)
 
     if created_user:
         await referral_links.increase_users_count(name=command.args)
-        await send_user_agreement(to_message=message)
+
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
+    await send_user_agreement(to_message=message)
 
 
 async def handle_start_to_show_game_cmd(message: Message, command: CommandObject):
