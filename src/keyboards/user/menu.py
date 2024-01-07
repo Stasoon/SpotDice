@@ -21,10 +21,14 @@ class UserMenuKeyboards:
         return builder.as_markup()
 
     @staticmethod
-    def get_need_to_subscribe(url: str) -> InlineKeyboardMarkup:
+    def get_user_agreement_with_need_sub(url: str) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
+        builder.button(
+            text='📃 Соглашение',
+            web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'),
+        )
         builder.button(text='Канал', url=url)
-        builder.button(text='Проверить', callback_data='check_subscribe')
+        builder.button(text='✅ Проверить', callback_data='check_subscribe')
         builder.adjust(1)
         return builder.as_markup()
 

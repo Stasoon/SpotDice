@@ -191,7 +191,7 @@ class BlackJackStrategy(GameStrategy):
     @staticmethod
     async def __get_result_text(result: BlackJackResult, player_id):
         text = None  # Инициализируем переменную text для каждого игрока
-        print(result.__dict__)
+
         # Если есть в победителях
         if player_id in result.winnings:
             player_name = (await users.get_user_or_none(telegram_id=player_id)).name

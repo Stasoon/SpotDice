@@ -1,6 +1,7 @@
 import asyncio
 
 from aiogram.types import BotCommandScopeAllGroupChats, BotCommand
+from aiogram.enums import UpdateType
 
 from src import bot, dp
 from src.handlers import register_all_handlers
@@ -70,7 +71,10 @@ async def start_bot():
 
     try:
         # Запускаем поллинг
-        await dp.start_polling(bot, close_bot_session=True)
+        await dp.start_polling(
+            bot, close_bot_session=True,
+            allowed_updates=["message", "callback_query", "chat_member", "my_chat_member"]
+        )
     except Exception as e:
         logger.exception(e)
 
