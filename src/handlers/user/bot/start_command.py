@@ -19,15 +19,12 @@ from src.misc.states import CheckSubscribeStates
 # region Utils
 
 
-async def send_welcome(start_message: Message):
-    await start_message.answer_sticker(
-        sticker=UserMenuMessages.get_welcome_sticker(),
-        reply_markup=UserMenuKeyboards.get_main_menu()
-    )
+channel_id = -1001947654963
+channel_url = 'https://t.me/barrednews'
 
 
 async def send_user_agreement(to_message: Message):
-    markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/barrednews')
+    markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url=channel_url)
     text = UserMenuMessages.get_need_sub()
 
     await to_message.answer_animation(
@@ -117,19 +114,25 @@ async def handle_join_band(message: Message, command: CommandObject):
 
 
 async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMContext):
-    member = None
-
     try:
-        member = await callback.bot.get_chat_member(chat_id=-1001947654963, user_id=callback.from_user.id)
+        member = await callback.bot.get_chat_member(chat_id=channel_id, user_id=callback.from_user.id)
     except Exception:
-        await callback.answer('Вы не подписались!')
+        await callback.message.answer_animation(
+            animation=UserMenuMessages.get_user_agreement_animation(),
+            text=UserMenuMessages.get_welcome(),
+            reply_markup=UserMenuKeyboards.get_main_menu()
+        )
         return
 
-    if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR]:
+    if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR]:
         await callback.answer('Вы не подписались!')
     else:
         await callback.message.delete()
-        await callback.message.answer(text=UserMenuMessages.get_welcome(), reply_markup=UserMenuKeyboards.get_main_menu())
+        await callback.message.answer_animation(
+            animation=UserMenuMessages.get_user_agreement_animation(),
+            text=UserMenuMessages.get_welcome(),
+            reply_markup=UserMenuKeyboards.get_main_menu()
+        )
         await state.clear()
 
 

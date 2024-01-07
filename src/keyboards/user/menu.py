@@ -39,7 +39,7 @@ class UserMenuKeyboards:
         menu_kb = ReplyKeyboardMarkup(keyboard=[
             [KeyboardButton(text="🎰  Играть  🎰")],
             [KeyboardButton(text="🎩 Профиль"), KeyboardButton(text="🏆 Топ игроков")],
-            [KeyboardButton(text="📰 События"), KeyboardButton(text="ℹ Информация")],
+            [KeyboardButton(text="📰 События"), KeyboardButton(text="♟ Информация")],
             [KeyboardButton(text="🕸️ Банды")]
             ],
             resize_keyboard=True, input_field_placeholder=None)
@@ -50,11 +50,18 @@ class UserMenuKeyboards:
     def get_events():
         builder = InlineKeyboardBuilder()
 
-        builder.button(text='📆 История и планы 📆', web_app=WebAppInfo(url='https://mj6290.craftum.io/spotdiceroadmap'))
-        builder.button(text='⚽ Турнир "Бутс"', url='https://t.me/SpotDiceN/24')
-        builder.button(text='🎴 Турнир "Козырь"', url='https://t.me/SpotDiceN/24')
+        # builder.button(text='📆 История и планы 📆', web_app=WebAppInfo(url='https://mj6290.craftum.io/spotdiceroadmap'))
+        builder.button(text='🃏 битва Игрока «Н» с DICY', url='https://t.me/barrednews/31')
+        builder.button(text='▫ Планы SpotDice', callback_data='spotdice_plans')
 
         return builder.adjust(1).as_markup()
+
+    @staticmethod
+    def get_back_to_events():
+        builder = InlineKeyboardBuilder()
+        builder.button(text='🔙 Назад', callback_data=MenuNavigationCallback(branch='events'))
+        builder.adjust(1)
+        return builder.adjust()
 
     # branch PROFILE
     @staticmethod
