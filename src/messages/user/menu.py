@@ -12,8 +12,9 @@ from src.utils.text_utils import format_float_to_rub_string
 class UserMenuMessages:
 
     @staticmethod
-    def get_welcome(user_name: str = 'незнакомец') -> str:
-        return f"👋 Привет, {html.bold(html.quote(user_name))}!"
+    def get_welcome() -> str:
+        return f"Добро пожаловать! \n\n@SpotDice — беседа нашего заведения \n\n" \
+               f"Вводи команду /help в игровом чате, она покажет и расскажет тебе о всех функциях игры. \nВникай и скорее к игровому столу 💎"
 
     @staticmethod
     def get_welcome_sticker() -> str:
@@ -27,6 +28,10 @@ class UserMenuMessages:
     @staticmethod
     def get_user_agreement_animation() -> str:
         return 'https://telegra.ph/file/39827678fc24d72d687f1.mp4'
+
+    @staticmethod
+    def get_need_sub() -> str:
+        return 'Перед тем, как войти в комнату с игровыми столами — подпишись на <b>BarredNews</b>, новости нашего города 💎'
 
     @staticmethod
     def get_play_menu(user: User) -> str:
@@ -110,51 +115,51 @@ class UserMenuMessages:
         return """
 Доступные команды ❔
 
-Чат нашего заведения: @SpotDice
+Для начала тебе нужно зайти в @SpotDice_bot и прописать /start. Если ты уже это сделал:
   
 👤 Игры на двоих:
 
-🏀 /basket [сумма] 
-🎲 /dice [сумма]
-🎯 /darts [сумма]  
-🎰 /slots [сумма]
-🎳 /bowl [сумма]
-⚽️ /foot [сумма]
+🏀 <code>/basket</code> [сумма] 
+🎲 <code>/dice</code> [сумма]
+🎯 <code>/darts</code> [сумма]  
+🎰 <code>/slots</code> [сумма]
+🎳 <code>/bowl</code> [сумма]
+⚽ <code>/foot</code> [сумма]
 
 👥 Игры на троих:
 
-🏀 /basket3 [сумма]
-🎲 /dice3 [сумма] 
-🎯 /darts3 [сумма] 
-🎰 /slots3 [сумма]
-🎳 /bowl3 [сумма]
-⚽️ /foot3 [сумма]
+🏀 <code>/basket3</code> [сумма]
+🎲 <code>/dice3</code> [сумма] 
+🎯 <code>/darts3</code> [сумма] 
+🎰 <code>/slots3</code> [сумма]
+🎳 <code>/bowl3</code> [сумма]
+⚽ <code>/foot3</code> [сумма]
 
 
 💣 Мини-игры
-🎲 /cube [сумма] [число от 1-6]
-🎰 /casino [сумма]
+🎲 <code>/cube</code> [сумма] [число от 1-6]
+🎰 <code>/casino</code> [сумма]
 
 Карточные игры: 
-♠️ BlackJack — /bj [ставка]
+♠️ BlackJack — <code>/bj</code> [ставка]
 
-🎴 Baccarat — /baccarat [ставка]
+🎴 Baccarat — <code>/baccarat</code> [ставка]
 
 🎱 Игры можно создавать в любой беседе, где есть наш бот. Добавляй в чат с друзьями
 
 Погрузиться во всю историю тебе помогут статьи BarredNews: 
 
-— О том, как же устроен город читай в этой <a href="https://telegra.ph/Pravila-Goroda-01-04">новостной сводке</a>. 
+— О том, как же устроен город читай в этой новостной сводке (https://telegra.ph/Pravila-Goroda-01-04). 
 
-— Про систему лиг читай подробнее в этой <a href="https://telegra.ph/Pravila-lig-01-04">новостной сводке</a>.
+— Про систему лиг читай подробнее в этой новостной сводке (https://telegra.ph/Pravila-lig-01-04).
 
-— Про то, как работают банды читай в этой <a href="https://telegra.ph/Kak-zhe-rabotayut-Bandy-01-04">новостной сводке</a>.
+— Про то, как работают банды читай в нашей новостной сводке (https://telegra.ph/Kak-zhe-rabotayut-Bandy-01-04).
 
 
-💡Другие команды
+💡Другие команды:
 
-❌ /del [ответ на режим] - Удалить игру
-🔍 /all games -  Активные игры чата
-🗂  /my games - Ваши незавершенные игры
+❌ <code>/del</code> [ответ на режим] - Удалить игру
+🔍 /allgames -  Активные игры чата
+🗂  /mygames - Ваши незавершенные игры
 🪪  /profile  - Отображает информацию чате
 """

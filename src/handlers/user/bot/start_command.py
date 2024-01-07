@@ -26,24 +26,19 @@ async def send_welcome(start_message: Message):
     )
 
 
-# async def send_need_to_subscribe(to_message: Message):
-#     channel_url = ''
-#     await to_message.answer(
-#         text='Чтобы начать пользоваться ботом, подпишитесь на канал',
-#         reply_markup=UserMenuKeyboards.get_need_to_subscribe(url=channel_url)
-#     )
-
-
 async def send_user_agreement(to_message: Message):
     member = await to_message.bot.get_chat_member(chat_id=-1001947654963, user_id=to_message.from_user.id)
 
     if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR]:
         markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/barrednews')
+        text = UserMenuMessages.get_need_sub()
     else:
         markup = UserMenuKeyboards.get_user_agreement()
+        text = None
 
     await to_message.answer_animation(
         animation=UserMenuMessages.get_user_agreement_animation(),
+        caption=text,
         reply_markup=markup
     )
 
@@ -139,12 +134,13 @@ async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMCo
         member = await callback.bot.get_chat_member(chat_id=-1001947654963, user_id=callback.from_user.id)
     except Exception:
         await callback.answer('Вы не подписались!')
+        return
 
-    if not member:
+    if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR]:
         await callback.answer('Вы не подписались!')
     else:
         await callback.message.delete()
-        await callback.message.answer(text='Добро пожаловать!', reply_markup=UserMenuKeyboards.get_main_menu())
+        await callback.message.answer(text=UserMenuMessages.get_welcome(), reply_markup=UserMenuKeyboards.get_main_menu())
         await state.clear()
 
 

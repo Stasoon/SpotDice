@@ -294,7 +294,8 @@ async def handle_rating_callback(callback: CallbackQuery):
 async def handle_city_callback(callback: CallbackQuery):
     await callback.message.delete()
     await callback.message.answer_photo(
-        caption='Город', reply_markup=BandsKeyboards.get_city(), photo=BandsMessages.get_global_map_photo()
+        caption='🗺 Карта города <b>BarredLand</b>', reply_markup=BandsKeyboards.get_city(),
+        photo=BandsMessages.get_global_map_photo()
     )
     # await callback.message.edit_media()
 
