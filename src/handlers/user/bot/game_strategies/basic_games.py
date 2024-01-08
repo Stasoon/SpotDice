@@ -1,12 +1,13 @@
 import asyncio
 
 from aiogram import Router, F, Bot
+from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import Message
 
 from src.database import games, Game, transactions, PlayerScore, User
 from src.database.games import game_scores
 from src.handlers.user.bot.game_strategies.game_strategy import GameStrategy
-from src.keyboards import UserMenuKeyboards, UserPrivateGameKeyboards
+from src.keyboards import UserMenuKeyboards, UserBotGameKeyboards
 from src.messages import UserPublicGameMessages
 from src.misc import GameStatus
 from src.utils.choose_game_messages import get_message_instance_by_game_type
@@ -16,21 +17,78 @@ from src.utils.timer import BaseTimer
 
 class GameTimer(BaseTimer):
 
+    def __init__(self, bot: Bot, game: Game, chat_id: int, message_id: int, seconds_expiry: int, text_template: str):
+        super().__init__(chat_id, message_id, seconds_expiry)
+
+        self.bot = bot
+        self.game = game
+        self.template = text_template
+
+    @classmethod
+    async def stop(cls, bot: Bot, chat_id: int):
+        try:
+            timer = await super(GameTimer, cls).stop(chat_id)
+            await bot.delete_message(chat_id=timer.chat_id, message_id=timer.message_id)
+        except Exception:
+            pass
+
     async def make_tick(self):
-        pass
+        await super(GameTimer, self).make_tick()
+
+        try:
+            await self.bot.edit_message_text(
+                chat_id=self.timer.chat_id,
+                message_id=self.timer.message_id,
+                text=self.template.format(str(self))
+            )
+        except Exception:
+            return
 
     async def on_time_left(self):
-        pass
+        try:
+            await self.bot.delete_message(chat_id=self.timer.chat_id, message_id=self.timer.message_id)
+        except TelegramBadRequest:
+            pass
+
+        await self.bot.send_message(chat_id=self.timer.chat_id, text="Время на ход вышло!")
+        await game_scores.add_player_move_if_not_moved(self.game, self.timer.chat_id, move_value=0)
+
+        if await game_scores.is_all_players_moved(self.game):
+            await BasicGameStrategy.finish_game(self.bot, self.game)
+
+        await self.timer.delete()
 
 
 class BasicGameStrategy(GameStrategy):
 
     @staticmethod
     async def start_game(bot: Bot, game: Game):
+        time_on_move = 2 * 60
         msg_instance = get_message_instance_by_game_type(game_type=game.game_type)
+        player_ids = await games.get_player_ids_of_game(game)
+
         text = msg_instance.get_game_started()
-        markup = UserPrivateGameKeyboards.get_dice_kb(game.game_type.value)
-        await GameMessageSender(bot, game).send(text, markup=markup)
+        counter_text = "⏱ Время на ход: {0}"
+        markup = UserBotGameKeyboards.get_dice_kb(game.game_type.value)
+
+        timers = []
+
+        for player_id in player_ids:
+            await bot.send_message(chat_id=player_id, text=text, reply_markup=markup)
+            counter_msg = await bot.send_message(
+                chat_id=player_id, text=counter_text.format(GameTimer.format_seconds_to_time(time_on_move))
+            )
+
+            timer = GameTimer(
+                bot=bot, game=game,
+                chat_id=player_id, message_id=counter_msg.message_id,
+                seconds_expiry=time_on_move, text_template=counter_text,
+            )
+
+            # Создаем задачу для таймера и добавляем ее в список
+            timers.append(asyncio.create_task(timer.start()))
+
+        await asyncio.gather(*timers)
 
     @staticmethod
     async def __make_refund_for_tie(game: Game, game_moves: list[PlayerScore]) -> None:
@@ -118,23 +176,36 @@ class BasicGameStrategy(GameStrategy):
         # Если игрок есть в игре и тип эмодзи соответствует
         if game and dice.emoji == game.game_type.value:
             await cls.process_player_move(game, message)
+            await GameTimer.stop(bot=message.bot, chat_id=message.from_user.id)
 
         # если все походили заканчиваем игру
         if len(await game_scores.get_game_moves(game)) == game.max_players:
             await cls.finish_game(bot=message.bot, game=game)
 
     @classmethod
-    async def process_player_move(cls, game: Game, message: Message):
+    async def process_player_move(cls, game: Game, move_message: Message):
         """Обрабатывает ход в игре"""
         game_moves = await game_scores.get_game_moves(game)
-        player_telegram_id = message.from_user.id
-        dice_value = message.dice.value
+
+        if not await game_scores.is_player_moved(game=game, user_id=move_message.from_user.id):
+            for player_id in await games.get_player_ids_of_game(game=game):
+                if player_id != move_message.from_user.id:
+                    try:
+                        await move_message.forward(chat_id=player_id)
+                    except Exception:
+                        pass
+
+        player_telegram_id = move_message.from_user.id
+        dice_value = move_message.dice.value
 
         # если не все игроки сделали ходы
         if len(game_moves) != game.max_players:
             await game_scores.add_player_move_if_not_moved(
                 game=game, player_telegram_id=player_telegram_id, move_value=dice_value
             )
+
+        if len(game_moves) + 1 != game.max_players:
+            await move_message.answer('Твой ход принят. Ожидай своего соперника.')
 
     @classmethod
     def register_moves_handlers(cls, router: Router):

@@ -5,7 +5,7 @@ from aiogram.exceptions import TelegramBadRequest
 
 from src.utils import logger
 from src.database import games, Game
-from src.keyboards import UserPublicGameKeyboards
+from src.keyboards import UserChatGameKeyboards
 from src.messages import UserPublicGameMessages
 from settings import Config
 
@@ -18,7 +18,7 @@ async def send_game_created_in_bot_notification(bot: Bot, created_game: Game):
         game_start_message = await bot.send_message(
             chat_id=Config.Games.GAME_CHAT_ID,
             text=await UserPublicGameMessages.get_game_created_in_bot_notification(created_game, bot_username),
-            reply_markup=await UserPublicGameKeyboards.get_go_to_bot_and_join(created_game, bot_username),
+            reply_markup=await UserChatGameKeyboards.get_go_to_bot_and_join(created_game, bot_username),
             parse_mode='HTML'
         )
     except TelegramBadRequest:

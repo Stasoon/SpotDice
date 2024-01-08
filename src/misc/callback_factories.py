@@ -22,7 +22,7 @@ class GamesCallback(CallbackData, prefix="games"):
     game_category: Optional[GameCategory] = None  \n
     game_type: Optional[GameType] = None
     """
-    action: Literal['create', 'show', 'refresh', 'stats', 'cancel', 'join']
+    action: Literal['create', 'show', 'confirm', 'refresh', 'stats', 'cancel', 'join']
     game_number: Optional[int] = None
     game_category: Optional[GameCategory] = None
     game_type: Optional[GameType] = None

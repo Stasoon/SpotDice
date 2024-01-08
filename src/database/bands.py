@@ -171,8 +171,6 @@ async def update_band_league(band: Band):
         new_league = BandLeague.BUSINESSMEN
     elif band.score >= 20_000:
         new_league = BandLeague.CARD_MASTERS
-    elif band.score >= 20_000:
-        new_league = BandLeague.GAMBLERS
 
     if new_league and band.league != new_league:
         band.league = new_league

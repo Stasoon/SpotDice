@@ -1,7 +1,6 @@
 import asyncio
 
 from aiogram.types import BotCommandScopeAllGroupChats, BotCommand
-from aiogram.enums import UpdateType
 
 from src import bot, dp
 from src.handlers import register_all_handlers
@@ -10,6 +9,7 @@ from src.database.models import Band
 from src.handlers.user.chat.games_process.even_uneven_loop import start_even_uneven_loop
 from settings import Config
 from src.utils import logger
+from src.utils.delete_games import delete_unconfirmed_games
 from src.utils.draw_bands_map import run_periodic_maps_update
 from src.utils.send_league_updated import send_league_updated
 
@@ -18,6 +18,7 @@ async def set_bot_commands():
     await bot.set_my_commands(
         commands=[
             BotCommand(command='start', description='Запуск бота'),
+            BotCommand(command='deposit', description='Пополнить баланс'),
             BotCommand(command='promo', description='Активировать промокод')
         ]
     )
@@ -51,6 +52,9 @@ async def on_startup():
 
     # Обновление картинок банд каждый час
     asyncio.create_task(run_periodic_maps_update(bot, Config.Bands.maps_chat_id))
+
+    # Удаление неподтверждённых игр
+    asyncio.create_task(delete_unconfirmed_games(bot))
 
     logger.info('Бот запущен!')
 

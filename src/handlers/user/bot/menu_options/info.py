@@ -22,4 +22,4 @@ async def handle_information_button(message: Message, state: FSMContext):
 
 def register_info_handlers(router: Router):
     # ветка Информация
-    router.message.register(handle_information_button, F.text.contains('ℹ Информация'))
+    router.message.register(handle_information_button, F.text.lower().contains('информация'))

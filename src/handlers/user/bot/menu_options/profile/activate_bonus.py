@@ -10,7 +10,6 @@ from src.keyboards import UserMenuKeyboards
 from src.messages import UserMenuMessages
 from src.misc import MenuNavigationCallback
 from src.misc.states import ActivateBonusStates
-from src.utils.text_utils import format_float_to_rub_string
 
 
 async def handle_cancel_bonus_activation(message: Message, state: FSMContext):

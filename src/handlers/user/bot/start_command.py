@@ -7,7 +7,7 @@ from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
 
 from src.handlers.user.bot import even_uneven
 from src.handlers.user.bot.menu_options.bands import show_band_to_join
-from src.keyboards import UserPrivateGameKeyboards
+from src.keyboards import UserBotGameKeyboards
 from src.keyboards.user import UserMenuKeyboards
 from src.messages import get_full_game_info_text, GameErrors
 from src.messages.user import UserMenuMessages
@@ -69,7 +69,7 @@ async def handle_start_cmd_with_user_referral_link(message: Message, command: Co
 
 async def handle_empty_start_cmd(message: Message):
     # создаём пользователя, если не существует
-    created_user = await create_user(message.from_user)
+    await create_user(message.from_user)
 
     await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
     await send_user_agreement(to_message=message)
@@ -96,7 +96,7 @@ async def handle_start_to_show_game_cmd(message: Message, command: CommandObject
 
     await message.answer(
         text=await get_full_game_info_text(game),
-        reply_markup=await UserPrivateGameKeyboards.show_game(game),
+        reply_markup=await UserBotGameKeyboards.show_game(game),
     )
 
 
@@ -117,9 +117,10 @@ async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMCo
     try:
         member = await callback.bot.get_chat_member(chat_id=channel_id, user_id=callback.from_user.id)
     except Exception:
+        await callback.message.delete()
         await callback.message.answer_animation(
             animation=UserMenuMessages.get_user_agreement_animation(),
-            text=UserMenuMessages.get_welcome(),
+            caption=UserMenuMessages.get_welcome(),
             reply_markup=UserMenuKeyboards.get_main_menu()
         )
         return
@@ -130,7 +131,7 @@ async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMCo
         await callback.message.delete()
         await callback.message.answer_animation(
             animation=UserMenuMessages.get_user_agreement_animation(),
-            text=UserMenuMessages.get_welcome(),
+            caption=UserMenuMessages.get_welcome(),
             reply_markup=UserMenuKeyboards.get_main_menu()
         )
         await state.clear()

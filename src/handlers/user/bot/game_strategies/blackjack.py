@@ -157,34 +157,52 @@ class BlackJackStrategy(GameStrategy):
         won_players = {}
         tie = []
 
+        moves_values = [player_score.value for player_score in players_scores] + [dealer_points]
+        max_score = max(filter(lambda x: x <= 21, moves_values), default=0)
+
         for player_score in players_scores:
             # Если перебор очков, пропускаем игрока
             if player_score.value > 21:
                 continue
 
             player_id = player_score.player.telegram_id
-            # обычный выигрыш
-            if player_score.value > dealer_points or dealer_points > 21:
-                print('выиг', player_score.value, dealer_points)
+
+            # Выигрыш
+            if player_score.value == max_score and moves_values.count(player_score.value) == 1:
+                player_cards = await playing_cards.get_player_cards(game_number=game.number, player_id=player_id)
+                # если блэк джек
+                if len(player_cards) == 2 and player_score.value == 21:
+                    multiplier = 2.5
+                # обычный выигрыш
+                else:
+                    multiplier = 2
+
                 amount = await transactions.accrue_winnings(
-                    game_category=game.category, winner_telegram_id=player_id, amount=game.bet * 2
+                    game_category=game.category, winner_telegram_id=player_id, amount=game.bet * multiplier
                 )
                 won_players[player_id] = amount
-                continue
             # если ничья
-            elif player_score.value == dealer_points:
+            elif player_score.value == max_score:
                 await transactions.make_bet_refund(player_id=player_id, amount=game.bet, game=game)
                 tie.append(player_id)
                 continue
 
+            # обычный выигрыш
+            # if player_score.value > dealer_points and player_score.value == max_player_score:
+            #     amount = await transactions.accrue_winnings(
+            #         game_category=game.category, winner_telegram_id=player_id, amount=game.bet * 2
+            #     )
+            #     won_players[player_id] = amount
+            #     continue
+
             # блэк джек (чистая победа)
-            player_cards = await playing_cards.get_player_cards(game_number=game.number, player_id=player_id)
-            if len(player_cards) == 2 and player_score.value == 21:
-                amount = await transactions.accrue_winnings(
-                    game_category=game.category, winner_telegram_id=player_id, amount=game.bet * 2.5
-                )
-                won_players[player_id] = amount
-                continue
+            # player_cards = await playing_cards.get_player_cards(game_number=game.number, player_id=player_id)
+            # if len(player_cards) == 2 and player_score.value == 21:
+            #     amount = await transactions.accrue_winnings(
+            #         game_category=game.category, winner_telegram_id=player_id, amount=game.bet * 2.5
+            #     )
+            #     won_players[player_id] = amount
+            #     continue
 
         return BlackJackResult(winnings=won_players, ties=tie)
 
@@ -245,11 +263,6 @@ class BlackJackStrategy(GameStrategy):
                     caption=text,
                     photo=result_photo_file_id
                 )
-
-        await bot.send_photo(
-            chat_id=game.chat_id if game.chat_id < 0 else Config.Games.GAME_CHAT_ID,
-            photo=result_photo_file_id, caption=f'Результаты {game}'
-        )
 
     @staticmethod
     async def start_game(bot: Bot, game: Game):

@@ -173,14 +173,6 @@ async def send_result_to_players(bot, game: Game, bet_choices: Collection[Player
     reply_markup = UserMenuKeyboards.get_main_menu()
     await sender.send(text, markup=reply_markup)
 
-    # отправляем сообщение о том, что игра завершена, в чат
-    await bot.send_photo(
-        photo=result_photo_file_id,
-        chat_id=game.chat_id if game.chat_id < 0 else Config.Games.GAME_CHAT_ID,
-        caption=text,
-        parse_mode='HTML'
-    )
-
 
 class BaccaratTimer(BaseTimer):
 
@@ -215,15 +207,15 @@ class BaccaratTimer(BaseTimer):
         try:
             await self.bot.delete_message(chat_id=self.timer.chat_id, message_id=self.timer.message_id)
         except TelegramBadRequest:
-            return
-        else:
-            await self.bot.send_message(chat_id=self.timer.chat_id, text="Время на ход вышло!")
-            await game_scores.add_player_move_if_not_moved(
-                self.game, self.timer.chat_id, move_value=BaccaratBettingOption.NOT_MOVED.value
-            )
+            pass
 
-            if await game_scores.is_all_players_moved(self.game):
-                await BaccaratStrategy.finish_game(self.bot, self.game)
+        await self.bot.send_message(chat_id=self.timer.chat_id, text="Время на ход вышло!")
+        await game_scores.add_player_move_if_not_moved(
+            self.game, self.timer.chat_id, move_value=BaccaratBettingOption.NOT_MOVED.value
+        )
+
+        if await game_scores.is_all_players_moved(self.game):
+            await BaccaratStrategy.finish_game(self.bot, self.game)
 
         await self.timer.delete()
 

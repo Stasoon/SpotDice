@@ -25,5 +25,5 @@ async def handle_spot_dice_plans_callback(callback: CallbackQuery):
 
 def register_events_handlers(router: Router):
     router.message.register(handle_events_button, F.text.lower().contains('события'))
-    router.callback_query.register(handle_back_to_events_callback, MenuNavigationCallback.filter(branch='events'))
+    router.callback_query.register(handle_back_to_events_callback, MenuNavigationCallback.filter(F.branch=='events'))
     router.callback_query.register(handle_spot_dice_plans_callback, F.data == 'spotdice_plans')

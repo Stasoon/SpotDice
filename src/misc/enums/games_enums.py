@@ -60,7 +60,8 @@ class GameType(str, Enum):
 
 
 class GameStatus(IntEnum):
-    CANCELED = -1
+    CANCELLED = -1
     WAIT_FOR_PLAYERS = 0
-    ACTIVE = 1
-    FINISHED = 2
+    WAIT_FOR_CONFIRM = 1
+    ACTIVE = 2
+    FINISHED = 3

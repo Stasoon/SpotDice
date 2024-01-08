@@ -5,7 +5,7 @@ from aiogram.types import CallbackQuery, Message
 
 from src.database import users, games, transactions
 from src.handlers.user.chat.chat import send_game_created_in_bot_notification
-from src.keyboards.user import UserPrivateGameKeyboards, UserMenuKeyboards
+from src.keyboards.user import UserBotGameKeyboards, UserMenuKeyboards
 from src.messages import get_full_game_info_text
 from src.messages.user import UserMenuMessages, UserPrivateGameMessages, GameErrors
 from src.utils.choose_game_messages import get_message_instance_by_game_type, get_game_category_message_instance
@@ -19,14 +19,14 @@ from src.misc.states import EnterBetStates
 
 async def get_play_message_data(user_id: int) -> dict:
     text = UserMenuMessages.get_play_menu(await users.get_user_or_none(user_id))
-    reply_markup = UserPrivateGameKeyboards.get_play_menu()
+    reply_markup = UserBotGameKeyboards.get_play_menu()
     return {'text': text, 'reply_markup': reply_markup, 'parse_mode': 'HTML'}
 
 
 async def show_game_category(
         to_callback: CallbackQuery, game_category: GameCategory, page_num: int = 0
 ):
-    games_per_page = 2
+    games_per_page = 6
     offset = page_num * games_per_page
 
     available_games = await games.get_bot_available_games(
@@ -44,7 +44,7 @@ async def show_game_category(
         return
 
     text = message_instance.get_category_description(player_name=player.name)
-    markup = await UserPrivateGameKeyboards.get_game_category(
+    markup = await UserBotGameKeyboards.get_game_category(
         available_games=available_games, category=game_category, current_page_num=page_num
     )
 
@@ -57,7 +57,7 @@ async def show_game_category(
 async def show_basic_game_types(to_message: Message):
     await to_message.edit_text(
         text=UserPrivateGameMessages.get_choose_game_type(),
-        reply_markup=UserPrivateGameKeyboards.get_basic_game_types(),
+        reply_markup=UserBotGameKeyboards.get_basic_game_types(),
         parse_mode='HTML'
     )
 
@@ -71,7 +71,7 @@ async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_c
         message_instance=message_instance, user_id=callback.from_user.id, game_type_name=game_type.get_full_name()
     )
     await message.answer(
-        text=text, reply_markup=UserPrivateGameKeyboards.get_cancel_bet_entering(game_category), parse_mode='HTML'
+        text=text, reply_markup=UserBotGameKeyboards.get_cancel_bet_entering(game_category), parse_mode='HTML'
     )
 
 
@@ -98,7 +98,7 @@ async def handle_game_category_stats_callback(callback: CallbackQuery, callback_
     game_category = callback_data.game_category
     await callback.message.edit_text(
         text=await UserPrivateGameMessages.get_game_category_stats(game_category),
-        reply_markup=UserPrivateGameKeyboards.get_back_from_stats(game_category),
+        reply_markup=UserBotGameKeyboards.get_back_from_stats(game_category),
         parse_mode='HTML'
     )
 
@@ -119,6 +119,7 @@ async def handle_cancel_game_callback(callback: CallbackQuery, callback_data: Ga
     """ Обработка нажатия на кнопку Отменить игру """
     game = await games.get_game_obj(callback_data.game_number)
     await check_rights_and_cancel_game(event=callback, game=game)
+
     await callback.answer(text=UserPrivateGameMessages.get_game_successfully_canceled())
     await show_game_category(to_callback=callback, game_category=callback_data.game_category)
 
@@ -206,7 +207,7 @@ async def handle_show_game_callback(callback: CallbackQuery, callback_data: Game
     game = await games.get_game_obj(callback_data.game_number)
     await callback.message.edit_text(
         text=await get_full_game_info_text(game),
-        reply_markup=await UserPrivateGameKeyboards.get_join_game_or_back(
+        reply_markup=await UserBotGameKeyboards.get_join_game_or_back(
             user_id=callback.from_user.id, game=game
         ),
         parse_mode='HTML'

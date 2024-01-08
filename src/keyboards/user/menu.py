@@ -1,6 +1,8 @@
 from aiogram.types import WebAppInfo
-from aiogram.utils.keyboard import (InlineKeyboardMarkup, InlineKeyboardButton, KeyboardButton,
-                                    ReplyKeyboardMarkup, InlineKeyboardBuilder)
+from aiogram.utils.keyboard import (
+    InlineKeyboardMarkup, KeyboardButton,
+    ReplyKeyboardMarkup, InlineKeyboardBuilder
+)
 
 
 from src.misc import MenuNavigationCallback
@@ -50,7 +52,6 @@ class UserMenuKeyboards:
     def get_events():
         builder = InlineKeyboardBuilder()
 
-        # builder.button(text='📆 История и планы 📆', web_app=WebAppInfo(url='https://mj6290.craftum.io/spotdiceroadmap'))
         builder.button(text='🃏 битва Игрока «Н» с DICY', url='https://t.me/barrednews/31')
         builder.button(text='▫ Планы SpotDice', callback_data='spotdice_plans')
 
@@ -61,7 +62,7 @@ class UserMenuKeyboards:
         builder = InlineKeyboardBuilder()
         builder.button(text='🔙 Назад', callback_data=MenuNavigationCallback(branch='events'))
         builder.adjust(1)
-        return builder.adjust()
+        return builder.as_markup()
 
     # branch PROFILE
     @staticmethod
@@ -112,7 +113,7 @@ class UserMenuKeyboards:
         builder.button(text='♦ Канал', url='https://t.me/barrednews')
         builder.button(text='🪙 Выплаты', url='https://t.me/spotdiceV')
         builder.button(text='⭐ ЧАТ', url='https://t.me/SpotDice')
-        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'))
+        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-07'))
 
         builder.adjust(2, 1, 1)
         return builder.as_markup()

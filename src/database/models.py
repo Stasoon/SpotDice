@@ -82,14 +82,19 @@ class Game(Model):
     number = fields.BigIntField(pk=True, generated=True, unique=True)
     bet = fields.FloatField()
     max_players = fields.SmallIntField()
+
     creator = fields.ForeignKeyField('models.User', related_name='games_creator')
     players = fields.ManyToManyField('models.User', related_name='games_participated')
+
     chat_id = fields.BigIntField(null=True)
     message_id = fields.BigIntField(null=True)
+
     category = fields.CharEnumField(enum_type=GameCategory, max_length=10)
     game_type = fields.CharEnumField(enum_type=GameType, max_length=1)
     status = fields.IntEnumField(enum_type=GameStatus, description=str(GameStatus))
-    start_time = fields.DatetimeField(auto_now_add=True)
+
+    time_created = fields.DatetimeField(auto_now_add=True)
+    time_started = fields.DatetimeField(null=True)
 
     def __str__(self):
         return f'Игра {self.game_type.value}№{self.number}'
@@ -98,9 +103,9 @@ class Game(Model):
         table = "games"
 
 
-# class GameStartConfirm(Model):
-#     game = fields.ForeignKeyField('models.Game', related_name='con')
-#     player = fields.ForeignKeyField('models.User', related_name='')
+class GameStartConfirm(Model):
+    player = fields.ForeignKeyField('models.User', related_name='game_confirms')
+    game = fields.ForeignKeyField('models.Game', related_name='confirmed')
 
 
 class PlayerScore(Model):
@@ -153,7 +158,7 @@ class PromoCode(Model):
         table = "promo_codes"
 
 
-class BonusActivation(Model):
+class PromoCodeActivation(Model):
     user = fields.ForeignKeyField('models.User', related_name='bonus_activations')
     bonus = fields.ForeignKeyField('models.PromoCode', related_name='activations')
 

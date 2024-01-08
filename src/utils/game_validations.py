@@ -13,8 +13,6 @@ from src.misc import GameStatus
 async def check_rights_and_cancel_game(event: CallbackQuery | Message, game: Game):
     """ Проверяет, может ли игрок отменить игру. Если может, возвращает ставки и удаляет игру """
     user_id = event.from_user.id
-    if isinstance(event, CallbackQuery): message = event.message
-    else: message = event
 
     # игра не найдена
     if not game:
@@ -32,7 +30,10 @@ async def check_rights_and_cancel_game(event: CallbackQuery | Message, game: Gam
     else:
         if game.message_id:
             try:
-                await event.bot.delete_message(chat_id=message.chat.id, message_id=game.message_id)
+                await event.bot.delete_message(
+                    chat_id=game.chat_id if game.chat_id < 0 else Config.Games.GAME_CHAT_ID,
+                    message_id=game.message_id
+                )
             except TelegramBadRequest:
                 pass
         await games.cancel_game(game)
@@ -131,7 +132,7 @@ async def validate_join_game_request(callback: CallbackQuery, game: Game) -> boo
     user_active_game = await games.get_user_unfinished_game(user_id)
 
     # если игра уже закончена
-    if game.status in (GameStatus.CANCELED, GameStatus.FINISHED):
+    if game.status in (GameStatus.CANCELLED, GameStatus.FINISHED):
         await callback.answer(text=GameErrors.get_game_is_full())
         return False
     # если баланс меньше ставки

@@ -19,6 +19,10 @@ async def is_all_players_moved(game: Game) -> bool:
     return moves_count == game.max_players
 
 
+async def is_player_moved(game: Game, user_id: int) -> bool:
+    return await PlayerScore.filter(game=game, player_id=user_id).exists()
+
+
 # Delete
 async def delete_game_scores(game: Game) -> None:
     try:

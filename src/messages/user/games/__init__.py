@@ -1,6 +1,6 @@
-from .baccarat_messages import BaccaratMessages
-from .even_uneven_messages import EvenUnevenMessages
-from .black_jack_messages import BlackJackMessages
+from .baccarat import BaccaratMessages
+from .even_uneven import EvenUnevenMessages
+from .black_jack import BlackJackMessages
 from .basketball import BasketballMessages
 from .games import (
     UserPrivateGameMessages, UserPublicGameMessages,

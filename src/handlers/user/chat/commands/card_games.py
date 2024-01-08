@@ -4,7 +4,7 @@ from aiogram.types import Message
 
 from src.database import games, transactions, Game
 from src.handlers.user.bot.game_strategies import BaccaratStrategy, BlackJackStrategy
-from src.keyboards import UserPublicGameKeyboards
+from src.keyboards import UserChatGameKeyboards
 from src.messages import UserPublicGameMessages
 from src.misc import GameType, GameCategory
 from src.utils.game_validations import validate_create_game_cmd
@@ -16,7 +16,7 @@ async def __send_game_created(message: Message, created_game: Game):
     # отправляем сообщение о том, что игра создана
     game_start_message = await message.answer(
         text=await UserPublicGameMessages.get_game_created_in_bot_notification(created_game, bot_username),
-        reply_markup=await UserPublicGameKeyboards.get_go_to_bot_and_join(created_game, bot_username),
+        reply_markup=await UserChatGameKeyboards.get_go_to_bot_and_join(created_game, bot_username),
         parse_mode='HTML'
     )
     # сохраняем сообщение в базе данных за начатой игрой

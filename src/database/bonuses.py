@@ -3,8 +3,8 @@ import random
 from decimal import Decimal
 
 from tortoise.exceptions import IntegrityError
+from .models import PromoCode, PromoCodeActivation, User
 
-from .models import PromoCode, BonusActivation, User
 
 
 def __generate_activation_code(length=8):
@@ -62,7 +62,7 @@ async def get_active_bonuses() -> list[PromoCode]:
 
 
 async def is_user_activated_bonus(bonus, user):
-    return await BonusActivation.filter(user=user, bonus=bonus).exists()
+    return await PromoCodeActivation.filter(user=user, bonus=bonus).exists()
 
 
 async def make_activation(bonus: PromoCode, user: User) -> bool:
@@ -81,7 +81,7 @@ async def make_activation(bonus: PromoCode, user: User) -> bool:
     await bonus.save()
 
     if not await is_user_activated_bonus(user=user, bonus=bonus):
-        await BonusActivation.create(user=user, bonus=bonus)
+        await PromoCodeActivation.create(user=user, bonus=bonus)
         user.balance += bonus.amount
         await user.save()
         return True

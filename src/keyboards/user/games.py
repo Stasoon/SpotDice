@@ -51,7 +51,8 @@ class BlackJackKeyboards:
 
 
 # клавиатуры для отображения в боте
-class UserPrivateGameKeyboards:
+class UserBotGameKeyboards:
+
     @staticmethod
     def get_dice_kb(dice_emoji: str) -> ReplyKeyboardMarkup:
         """Возвращает reply клавиатуру с эмодзи"""
@@ -184,9 +185,17 @@ class UserPrivateGameKeyboards:
 
         return builder.as_markup()
 
+    @staticmethod
+    def get_confirm_game_start() -> ReplyKeyboardMarkup:
+        markup = ReplyKeyboardMarkup(
+            keyboard=[[KeyboardButton(text="✅ Начать игру")]],
+            resize_keyboard=True
+        )
+        return markup
+
 
 # клавиатуры для отображения в чатах
-class UserPublicGameKeyboards:
+class UserChatGameKeyboards:
     @staticmethod
     async def get_go_to_bot_and_join(game: Game, bot_username: str):
         """Перейти в бота с кнопкой старт и показать игру (кнопка для чата)"""

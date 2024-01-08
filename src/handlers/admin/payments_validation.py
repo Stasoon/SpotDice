@@ -25,6 +25,10 @@ async def handle_validate_payment_callback(callback: CallbackQuery, callback_dat
             callback_data.user_id,
             text=f'❌ Ваша заявка на {transaction_word} {callback_data.amount}₽ была отклонена. \n\n'
                  f'Если считаете, что это ошибка - обратитесь в администрацию')
+
+        # Если был вывод, возвращаем средства
+        if callback_data.transaction_type == 'withdraw':
+            await deposit_to_user(user_id=callback_data.user_id, amount=callback_data.amount, create_record=False)
         return
 
     await deposit_to_user(

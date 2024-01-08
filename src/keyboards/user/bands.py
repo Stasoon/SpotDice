@@ -22,7 +22,7 @@ class BandsKeyboards:
                 text='➕ Создать свою банду', callback_data=MenuNavigationCallback(branch='bands', option='create')
             )
         else:
-            builder.button(text=f"Ваша банда: {user_band.title}", callback_data=BandCallback(band_id=user_band.id))
+            builder.button(text=f"⚫ Твоя банда: {user_band.title}", callback_data=BandCallback(band_id=user_band.id))
         builder.button(text='📊 Рейтинг', callback_data=MenuNavigationCallback(branch='bands', option='rating'))
         builder.adjust(1)
         return builder.as_markup()

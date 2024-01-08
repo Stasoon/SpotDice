@@ -1,9 +1,10 @@
+from datetime import datetime
 from typing import List, Union
 
 from tortoise.exceptions import DoesNotExist, MultipleObjectsReturned
 from tortoise.expressions import Q
 
-from ..models import Game, User
+from ..models import Game, User, GameStartConfirm
 from ..users import get_user_or_none
 from src.misc import GameStatus, GameCategory, GameType
 
@@ -109,7 +110,8 @@ async def get_user_unfinished_game(telegram_id: int) -> Game | None:
 
     await user.fetch_related('games_participated')
     game = await user.games_participated.filter(
-        (Q(status=GameStatus.ACTIVE) | Q(status=GameStatus.WAIT_FOR_PLAYERS)) & Q(players=user)
+        (Q(status=GameStatus.ACTIVE) | Q(status=GameStatus.WAIT_FOR_PLAYERS) | Q(status=GameStatus.WAIT_FOR_CONFIRM))
+        & Q(players=user)
     ).first()
 
     return game if game else None
@@ -120,7 +122,7 @@ async def get_user_active_game(telegram_id: int) -> Game | None:
     user = await User.get_or_none(telegram_id=telegram_id)
     await user.fetch_related('games_participated')
     game = await user.games_participated.filter(
-        Q(status=GameStatus.ACTIVE) & Q(players=user)
+        (Q(status=GameStatus.ACTIVE) | Q(status=GameStatus.WAIT_FOR_CONFIRM)) & Q(players=user)
     ).all().first()
 
     return game if game else None
@@ -149,13 +151,21 @@ async def update_message_id(game: Game, new_message_id: int):
 async def finish_game(game: Game) -> None:
     game.status = GameStatus.FINISHED
     await game.save()
+    await GameStartConfirm.filter(game=game).delete()
 
 
 async def cancel_game(game: Game):
-    game.status = GameStatus.CANCELED
+    game.status = GameStatus.CANCELLED
     await game.save()
+    await GameStartConfirm.filter(game=game).delete()
 
 
 async def activate_game(game: Game):
     game.status = GameStatus.ACTIVE
+    await game.save()
+
+
+async def set_wait_for_confirm_status(game: Game):
+    game.status = GameStatus.WAIT_FOR_CONFIRM
+    game.time_started = datetime.now()
     await game.save()
