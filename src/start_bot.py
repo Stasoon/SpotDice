@@ -19,6 +19,7 @@ async def set_bot_commands():
         commands=[
             BotCommand(command='start', description='Запуск бота'),
             BotCommand(command='deposit', description='Пополнить баланс'),
+            BotCommand(command='cashout', description='Вывести средства'),
             BotCommand(command='promo', description='Активировать промокод')
         ]
     )

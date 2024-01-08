@@ -189,7 +189,7 @@ class UserBotGameKeyboards:
     def get_confirm_game_start() -> ReplyKeyboardMarkup:
         markup = ReplyKeyboardMarkup(
             keyboard=[[KeyboardButton(text="✅ Начать игру")]],
-            resize_keyboard=True
+            resize_keyboard=True, is_persistent=True
         )
         return markup
 

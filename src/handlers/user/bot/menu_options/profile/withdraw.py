@@ -1,5 +1,5 @@
 from aiogram import F, Router
-from aiogram.filters import StateFilter
+from aiogram.filters import StateFilter, Command
 from aiogram.fsm.context import FSMContext
 from aiogram.types import CallbackQuery, Message
 
@@ -66,25 +66,40 @@ async def handle_withdraw_callback(callback: CallbackQuery):
     )
 
 
+async def handle_withdraw_command(message: Message):
+    min_withdraw_amount = Config.Payments.min_withdraw_amount
+
+    if await users.get_user_balance(message.from_user.id) < min_withdraw_amount:
+        await message.answer(text=BalanceErrors.low_balance_for_withdraw(min_withdraw_amount))
+        return
+
+    await message.answer(
+        text=UserPaymentMessages.get_choose_withdraw_method(),
+        reply_markup=UserPaymentKeyboards.get_withdraw_methods(),
+        parse_mode='HTML'
+    )
+
+
 async def handle_show_withdraw_method_callbacks(
         callback: CallbackQuery, callback_data: WithdrawCallback, state: FSMContext
 ):
     """Обработка нажатия на метод вывода средств"""
     await state.update_data(method=callback_data.method)
 
-    # если метод вывода - криптобот
-    if callback_data.method == WithdrawMethod.CRYPTO_BOT:
-        text = UserPaymentMessages.choose_currency()
-        markup = await UserPaymentKeyboards.get_crypto_bot_choose_currency(transaction_type='withdraw')
-        await callback.message.edit_text(text=text, reply_markup=markup, parse_mode='HTML')
-
-    # если метод вывода полуавтоматический
-    elif callback_data.method in (WithdrawMethod.SBP, WithdrawMethod.U_MONEY):
-        await callback.message.delete()
-        text = UserPaymentMessages.enter_withdraw_amount(min_withdraw_amount=Config.Payments.min_withdraw_amount)
-        markup = UserPaymentKeyboards.get_cancel_payment()
-        await callback.message.answer(text=text, reply_markup=markup, parse_mode='HTML')
-        await state.set_state(HalfAutoWithdrawStates.wait_for_amount)
+    # # если метод вывода - криптобот
+    # if callback_data.method == WithdrawMethod.CRYPTO_BOT:
+    #     text = UserPaymentMessages.choose_currency()
+    #     markup = await UserPaymentKeyboards.get_crypto_bot_choose_currency(transaction_type='withdraw')
+    #     await callback.message.edit_text(text=text, reply_markup=markup, parse_mode='HTML')
+    #
+    # # если метод вывода полуавтоматический
+    # elif callback_data.method in (WithdrawMethod.SBP, WithdrawMethod.U_MONEY):
+    #
+    await callback.message.delete()
+    text = UserPaymentMessages.enter_withdraw_amount(min_withdraw_amount=Config.Payments.min_withdraw_amount)
+    markup = UserPaymentKeyboards.get_cancel_payment()
+    await callback.message.answer(text=text, reply_markup=markup, parse_mode='HTML')
+    await state.set_state(HalfAutoWithdrawStates.wait_for_amount)
 
 
 async def handle_withdraw_amount_message(message: Message, state: FSMContext):
@@ -163,6 +178,7 @@ def register_withdraw_handlers(router: Router):
     router.callback_query.register(
         handle_withdraw_callback, MenuNavigationCallback.filter((F.branch == 'profile') & (F.option == 'withdraw'))
     )
+    router.message.register(handle_withdraw_command, Command('cashout'))
 
     # Методы вывода средств
     router.callback_query.register(handle_show_withdraw_method_callbacks, WithdrawCallback.filter(~F.currency))

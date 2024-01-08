@@ -220,7 +220,7 @@ class BlackJackStrategy(GameStrategy):
         elif len(result.winnings) == 0 and len(result.ties) == 0:
             text = BlackJackMessages.get_global_loose()
         # Если у всех ничья
-        elif len(result.winnings) == 0 and len(result.ties) > 0:
+        elif len(result.winnings) == 0 and len(result.ties) == 2:  # кол-во ничьих = кол-ву игроков
             text = BlackJackMessages.get_global_tie()
         # Если нет в победителях (победил другой игрок)
         elif player_id not in result.winnings:

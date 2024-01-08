@@ -3,11 +3,7 @@ from aiogram.utils.keyboard import InlineKeyboardBuilder, InlineKeyboardMarkup
 from src.database.models import Band, User
 from src.misc.callback_factories import BandCallback, BandMemberCallback, MenuNavigationCallback, BandsMapCallback
 from src.misc.enums.leagues import BandLeague
-
-
-def number_to_emoji(number: int) -> str:
-    emoji_digits = ('0️⃣', '1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣')
-    return ''.join(emoji_digits[int(d)] for d in str(number))
+from src.utils.text_utils import get_emoji_number
 
 
 class BandsKeyboards:
@@ -15,14 +11,14 @@ class BandsKeyboards:
     def get_bands_menu(user_band: Band = None) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
 
-        builder.button(text='ℹ Информация', callback_data=MenuNavigationCallback(branch='bands', option='info'))
+        # builder.button(text='ℹ Информация', callback_data=MenuNavigationCallback(branch='bands', option='info'))
         builder.button(text='🏙 Город', callback_data=MenuNavigationCallback(branch='bands', option='city'))
         if not user_band:
             builder.button(
                 text='➕ Создать свою банду', callback_data=MenuNavigationCallback(branch='bands', option='create')
             )
         else:
-            builder.button(text=f"⚫ Твоя банда: {user_band.title}", callback_data=BandCallback(band_id=user_band.id))
+            builder.button(text=f"💲 Твоя банда: {user_band.title}", callback_data=BandCallback(band_id=user_band.id))
         builder.button(text='📊 Рейтинг', callback_data=MenuNavigationCallback(branch='bands', option='rating'))
         builder.adjust(1)
         return builder.as_markup()
@@ -110,11 +106,11 @@ class BandsKeyboards:
 
         for n, band in enumerate(bands, start=1):
             creator_link = band.creator.get_mention_url()
-            builder.button(text=f"{number_to_emoji(n)} {band.title} - {band.league}", url=creator_link)
+            builder.button(text=f"{get_emoji_number(n)} {band.title} - {band.league}", url=creator_link)
 
         if user_band and user_band_ranking and len(bands) < user_band_ranking:
             builder.button(text='...', callback_data='*')
-            text = f"{number_to_emoji(user_band_ranking)} {user_band.title} - {user_band.league}"
+            text = f"{get_emoji_number(user_band_ranking)} {user_band.title} - {user_band.league}"
             builder.button(text=text, url=user_band.creator.get_mention_url())
 
         builder.button(text='🔙 Назад', callback_data=MenuNavigationCallback(branch='bands', option=None))

@@ -80,7 +80,7 @@ async def handle_confirm_game_start_button(message: Message):
     if len(confirmations) < game.max_players:
         await message.answer(
             text='Хорошо! Подождём, пока соперник подтвердит начало игры...',
-            reply_markup=UserMenuKeyboards.get_main_menu()
+            reply_markup=ReplyKeyboardRemove()
         )
     else:
         try:

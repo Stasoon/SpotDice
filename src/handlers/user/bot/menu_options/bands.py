@@ -292,12 +292,16 @@ async def handle_rating_callback(callback: CallbackQuery):
 # ГОРОД
 
 async def handle_city_callback(callback: CallbackQuery):
-    await callback.message.delete()
-    await callback.message.answer_photo(
-        caption='🗺 Карта города <b>BarredLand</b>', reply_markup=BandsKeyboards.get_city(),
-        photo=BandsMessages.get_global_map_photo()
-    )
-    # await callback.message.edit_media()
+    text = BandsMessages.get_city_description()
+    markup = BandsKeyboards.get_city(current_league=None)
+    photo_url = BandsMessages.get_global_map_photo()
+
+    if callback.message.photo:
+        await callback.message.edit_media(media=InputMediaPhoto(media=photo_url))
+        await callback.message.edit_caption(caption=text, reply_markup=markup)
+    else:
+        await callback.message.delete()
+        await callback.message.answer_photo(caption=text, reply_markup=markup, photo=photo_url)
 
 
 async def handle_band_map_callback(callback: CallbackQuery, callback_data: BandsMapCallback):
@@ -306,31 +310,34 @@ async def handle_band_map_callback(callback: CallbackQuery, callback_data: Bands
         return
 
     map_photo = await get_bands_map_photo_file_id(league=callback_data.league)
+    band_names = [
+        band.title for band in
+        await bands.get_bands_rating_in_league(league=callback_data.league, count=6)
+    ]
 
-    await callback.message.delete()
-    await callback.message.answer_photo(
-        photo=map_photo,
+    await callback.message.edit_media(media=InputMediaPhoto(media=map_photo))
+    await callback.message.edit_caption(
         reply_markup=BandsKeyboards.get_city(current_league=callback_data.league),
-        caption=str(callback_data.league)
+        caption=BandsMessages.get_league_map_description(league=callback_data.league, band_names=band_names)
     )
 
 
-# ИНФОРМАЦИЯ
-
-async def handle_info_callback(callback: CallbackQuery):
-    await callback.message.edit_text(text='ℹ Информация о бандах', reply_markup=BandsKeyboards.get_info())
-
-
-async def handle_info_article_callback(callback: CallbackQuery, callback_data: MenuNavigationCallback):
-    text = ''
-
-    match callback_data.option:
-        case 'leagues_rules': text = BandsMessages.get_leagues_rules_explanation()
-        case 'rewards': text = BandsMessages.get_rewards_explanation()
-        case 'bands_rules': text = BandsMessages.get_bands_rules_explanation()
-        case 'city_rules': text = BandsMessages.get_city_rules_explanation()
-
-    await callback.message.edit_text(text=text, reply_markup=BandsKeyboards.get_back_to_info())
+# # ИНФОРМАЦИЯ
+#
+# async def handle_info_callback(callback: CallbackQuery):
+#     await callback.message.edit_text(text='ℹ Информация о бандах', reply_markup=BandsKeyboards.get_info())
+#
+#
+# async def handle_info_article_callback(callback: CallbackQuery, callback_data: MenuNavigationCallback):
+#     text = ''
+#
+#     match callback_data.option:
+#         case 'leagues_rules': text = BandsMessages.get_leagues_rules_explanation()
+#         case 'rewards': text = BandsMessages.get_rewards_explanation()
+#         case 'bands_rules': text = BandsMessages.get_bands_rules_explanation()
+#         case 'city_rules': text = BandsMessages.get_city_rules_explanation()
+#
+#     await callback.message.edit_text(text=text, reply_markup=BandsKeyboards.get_back_to_info())
 
 
 def register_bands_handlers(router: Router):
@@ -383,13 +390,13 @@ def register_bands_handlers(router: Router):
     )
     router.callback_query.register(handle_band_map_callback, BandsMapCallback.filter())
 
-    # Информация
-    router.callback_query.register(
-        handle_info_callback, MenuNavigationCallback.filter((F.branch == 'bands') & (F.option == 'info'))
-    )
-    router.callback_query.register(
-        handle_info_article_callback,
-        MenuNavigationCallback.filter(
-            (F.branch == 'bands') & (F.option.in_(['leagues_rules', 'rewards', 'bands_rules', 'city_rules']))
-        )
-    )
+    # # Информация
+    # router.callback_query.register(
+    #     handle_info_callback, MenuNavigationCallback.filter((F.branch == 'bands') & (F.option == 'info'))
+    # )
+    # router.callback_query.register(
+    #     handle_info_article_callback,
+    #     MenuNavigationCallback.filter(
+    #         (F.branch == 'bands') & (F.option.in_(['leagues_rules', 'rewards', 'bands_rules', 'city_rules']))
+    #     )
+    # )

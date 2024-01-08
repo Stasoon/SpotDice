@@ -68,7 +68,11 @@ class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
 
     @staticmethod
     def get_category_description(player_name: str) -> str:
-        return "🎲 Классические игры"
+        return (
+            "🎲 Games — 6 игровых режимов: Кости, Дартс, Баскетбол, Слоты, Боулинг, Футбол \n\n"
+            "Твоя задача в них: набрать больше очков, чем твой соперник и победа будет за тобой. \n"
+            "Переходи к игровым столам, нажав кнопку «➕ Создать»"
+        )
 
     @staticmethod
     def ask_for_bet_amount(player_name: str) -> str:

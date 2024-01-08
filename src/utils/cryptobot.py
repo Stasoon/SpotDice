@@ -1,9 +1,9 @@
-from typing import Generator, Any
+from typing import Generator
 
 import aiohttp
-import json
 
 from settings import Config
+from src.utils import logger
 
 
 url = 'https://pay.crypt.bot/api'
@@ -21,7 +21,7 @@ async def _make_get_request(method: str, params: dict = None) -> list[dict] | No
                 data = await response.json()
                 return data.get('result')
             else:
-                print(f"Error: {response.status}")
+                logger.error(f"Error: {response.status}")
                 return None
 
 
