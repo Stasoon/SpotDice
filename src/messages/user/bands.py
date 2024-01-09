@@ -78,6 +78,10 @@ class BandsMessages:
         return 'Нажмите на пользователя, которого хотите исключить:'
 
     @staticmethod
+    def get_bands_menu_photo() -> str:
+        return 'https://telegra.ph/file/3d5b3f9088dba0e0c39b1.png'
+
+    @staticmethod
     def get_global_map_photo() -> str:
         return 'https://telegra.ph/file/0f6ba0c9f77dc865169a5.png'
 

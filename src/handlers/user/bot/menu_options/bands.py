@@ -50,9 +50,10 @@ async def __get_bands_menu_message_data(for_user_id: int) -> dict:
     user_band = await bands.get_user_band(telegram_id=for_user_id)
 
     text = BandsMessages.get_bands_menu()
+    photo = BandsMessages.get_bands_menu_photo()
     markup = BandsKeyboards.get_bands_menu(user_band=user_band)
 
-    return {'text': text, 'reply_markup': markup}
+    return {'photo': photo, 'caption': text, 'reply_markup': markup}
 
 
 async def __get_user_band_message_data(band_id: int, user_id: int) -> dict:
@@ -103,14 +104,14 @@ async def show_band_to_join(bot: Bot, user_id: int, band_id: int):
 
 async def handle_bands_button(message: Message):
     menu_message_data = await __get_bands_menu_message_data(for_user_id=message.from_user.id)
-    await message.answer(**menu_message_data)
+    await message.answer_photo(**menu_message_data)
 
 
 # МОЯ БАНДА
 async def handle_cancel_band_creation(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    await callback.message.answer(**menu_message_data)
+    await callback.message.edit_caption(**menu_message_data)
     await state.clear()
 
 
@@ -120,7 +121,7 @@ async def handle_create_band_callback(callback: CallbackQuery, state: FSMContext
         await callback.answer(f'❗Вы не можете вступить в эту банду, '
                               f'так как уже являетесь участником банды {user_band.title}')
         band_message = await __get_user_band_message_data(band_id=user_band.id, user_id=callback.from_user.id)
-        await callback.message.edit_text(**band_message)
+        await callback.message.edit_caption(**band_message)
         return
 
     await callback.message.edit_text(
@@ -147,10 +148,11 @@ async def handle_new_band_title_message(message: Message, state: FSMContext):
 async def handle_back_to_bands_menu(callback: CallbackQuery):
     menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
     try:
-        await callback.message.edit_text(**menu_message_data)
+        await callback.message.delete()
+        await callback.message.answer_photo(**menu_message_data)
     except TelegramBadRequest:
         await callback.message.delete()
-        await callback.message.answer(**menu_message_data)
+        await callback.message.answer_photo(**menu_message_data)
 
 
 async def handle_show_my_band(callback: CallbackQuery, callback_data: BandCallback):
@@ -160,7 +162,8 @@ async def handle_show_my_band(callback: CallbackQuery, callback_data: BandCallba
         band_message_data = await __get_user_band_message_data(
             band_id=callback_data.band_id, user_id=callback.from_user.id
         )
-        await callback.message.edit_text(**band_message_data)
+        await callback.message.delete()
+        await callback.message.answer(**band_message_data)
 
 
 async def handle_rename_band(callback: CallbackQuery, callback_data: BandCallback, state: FSMContext):
@@ -244,7 +247,7 @@ async def handle_join_band_callback(callback: CallbackQuery, callback_data: Band
     await callback.answer('🎉 Поздравляю! Ты стал участником банды!', show_alert=True)
     await callback.message.delete()
     bands_menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    await callback.message.answer(**bands_menu_message_data)
+    await callback.message.answer_photo(**bands_menu_message_data)
 
 
 async def handle_leave_band(callback: CallbackQuery, callback_data: BandCallback):
@@ -286,7 +289,7 @@ async def handle_rating_callback(callback: CallbackQuery):
     user_band_rank = await bands.get_band_rating_position(target_band=user_band)
     markup = BandsKeyboards.get_global_rating(bands_rating, user_band, user_band_rank)
 
-    await callback.message.edit_text(text='📊 Рейтинг банд', reply_markup=markup)
+    await callback.message.edit_caption(caption='📊 Рейтинг банд', reply_markup=markup)
 
 
 # ГОРОД
