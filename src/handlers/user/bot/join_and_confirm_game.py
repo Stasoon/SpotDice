@@ -71,7 +71,7 @@ async def handle_confirm_game_start_button(message: Message):
     game = await games.get_user_unfinished_game(telegram_id=message.from_user.id)
 
     if game.status != GameStatus.WAIT_FOR_CONFIRM:
-        await message.answer('Другой игрок не подтвердил, игра отменена')
+        await message.answer('Другой игрок не подтвердил начало игры, поэтому она была отменена.')
         return
 
     await GameStartConfirm.get_or_create(player_id=message.from_user.id, game=game)

@@ -41,7 +41,7 @@ class UserMenuKeyboards:
         menu_kb = ReplyKeyboardMarkup(keyboard=[
             [KeyboardButton(text="🎰  Играть  🎰")],
             [KeyboardButton(text="🎩 Профиль"), KeyboardButton(text="🏆 Топ игроков")],
-            [KeyboardButton(text="📰 События"), KeyboardButton(text="♟ Информация")],
+            [KeyboardButton(text="📰 События"), KeyboardButton(text="ℹ Информация")],
             [KeyboardButton(text="🕸️ Банды")]
             ],
             resize_keyboard=True, input_field_placeholder=None)
@@ -117,5 +117,6 @@ class UserMenuKeyboards:
 
         builder.adjust(2, 1, 1)
         return builder.as_markup()
+
 
 

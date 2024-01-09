@@ -63,7 +63,7 @@ class BasicGameStrategy(GameStrategy):
 
     @staticmethod
     async def start_game(bot: Bot, game: Game):
-        time_on_move = 2 * 60
+        time_on_move = 10*60
         msg_instance = get_message_instance_by_game_type(game_type=game.game_type)
         player_ids = await games.get_player_ids_of_game(game)
 
@@ -174,9 +174,9 @@ class BasicGameStrategy(GameStrategy):
         dice = message.dice
 
         # Если игрок есть в игре и тип эмодзи соответствует
+        await GameTimer.stop(bot=message.bot, chat_id=message.from_user.id)
         if game and dice.emoji == game.game_type.value:
             await cls.process_player_move(game, message)
-            await GameTimer.stop(bot=message.bot, chat_id=message.from_user.id)
 
         # если все походили заканчиваем игру
         if len(await game_scores.get_game_moves(game)) == game.max_players:
@@ -210,3 +210,4 @@ class BasicGameStrategy(GameStrategy):
     @classmethod
     def register_moves_handlers(cls, router: Router):
         router.message.register(cls.handle_game_move_message, F.dice)
+

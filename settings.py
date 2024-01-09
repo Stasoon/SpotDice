@@ -19,7 +19,7 @@ class Config:
         MAX_BET = 50_000_000.0
         winning_commission: Final[float] = 0.05
 
-        min_withdraw_amount: Final[float] = float(100)
+        min_withdraw_amount: Final[float] = float(300)
         min_deposit_amount: Final[float] = float(50)
 
     class Games:

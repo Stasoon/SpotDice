@@ -1,5 +1,6 @@
 from datetime import datetime
 from typing import List, Union
+import pytz
 
 from tortoise.exceptions import DoesNotExist, MultipleObjectsReturned
 from tortoise.expressions import Q
@@ -167,5 +168,6 @@ async def activate_game(game: Game):
 
 async def set_wait_for_confirm_status(game: Game):
     game.status = GameStatus.WAIT_FOR_CONFIRM
-    game.time_started = datetime.now()
+    utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
+    game.time_started = utc_now
     await game.save()
