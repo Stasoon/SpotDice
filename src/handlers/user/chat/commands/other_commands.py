@@ -59,7 +59,7 @@ async def handle_delete_game_command(message: Message):
     if not message.reply_to_message:
         return
 
-    game = await games.get_game_by_message_id(message.reply_to_message.message_id)
+    game = await games.get_game_by_message_id(chat_id=message.chat.id, message_id=message.reply_to_message.message_id)
     await check_rights_and_cancel_game(event=message, game=game)
 
 
@@ -73,3 +73,4 @@ def register_other_commands_handlers(router: Router):
     router.message.register(handle_all_games_command, Command('allgames'))
     router.message.register(handle_my_games_command, Command('mygames'))
     router.message.register(handle_help_command, Command('help'))
+

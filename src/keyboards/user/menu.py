@@ -30,8 +30,9 @@ class UserMenuKeyboards:
             text='📃 Соглашение',
             web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'),
         )
-        builder.button(text='Канал', url=url)
-        builder.button(text='✅ Проверить', callback_data='check_subscribe')
+        #builder.button(text='Канал', url=url)
+        #builder.button(text='Игровой чат', url=url)
+        #builder.button(text='✅ Проверить', callback_data='check_subscribe')
         builder.adjust(1)
         return builder.as_markup()
 

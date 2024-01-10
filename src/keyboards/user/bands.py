@@ -153,3 +153,4 @@ class BandsKeyboards:
         builder.button(text='🔙 Назад', callback_data=MenuNavigationCallback(branch='bands', option='info'))
         builder.adjust(1)
         return builder.as_markup()
+

@@ -24,7 +24,7 @@ class AdminMessages:
             transaction_str = f'➕ Пополнение баланса ➕'
         else:
             transaction_str = f'➖ Вывод средств ➖'
-        user_requisites_str = f'💳 Реквизиты: \n{user_requisites} \n' if user_requisites else ''
+        user_requisites_str = f'💳 Реквизиты: \n<code>{user_requisites}</code> \n' if user_requisites else ''
 
         return f'{html.bold(transaction_str)} \n\n' \
                f'👤 {html.link(f"{user_name}", f"tg://user?id={user_id}")} \n' \
@@ -60,3 +60,4 @@ class AdminMessages:
             )
             text += '-' * 30 + '\n'
         return text
+

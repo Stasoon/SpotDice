@@ -24,19 +24,14 @@ channel_url = 'https://t.me/barrednews'
 
 
 async def send_user_agreement(to_message: Message):
-    # markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url=channel_url)
-    # text = UserMenuMessages.get_need_sub()
+    markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url=channel_url)
+    text = UserMenuMessages.get_need_sub()
 
     await to_message.answer_animation(
         animation=UserMenuMessages.get_user_agreement_animation(),
-        caption=UserMenuMessages.get_welcome(),
-        reply_markup=UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/SpotDice')
+        caption=text,
+        reply_markup=markup
     )
-    #await to_message.answer_animation(
-    #    animation=UserMenuMessages.get_user_agreement_animation(),
-    #    caption=text,
-    #    reply_markup=markup
-    #)
 
 
 async def create_user(telegram_user):
@@ -68,7 +63,7 @@ async def handle_start_cmd_with_user_referral_link(message: Message, command: Co
     if created_user:
         await process_referral_code_arg(command_args, message.from_user.id)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
     await send_user_agreement(to_message=message)
 
 
@@ -76,7 +71,7 @@ async def handle_empty_start_cmd(message: Message):
     # создаём пользователя, если не существует
     await create_user(message.from_user)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
     await send_user_agreement(to_message=message)
 
 
@@ -86,7 +81,7 @@ async def handle_promotion_link_start_cmd(message: Message, command: CommandObje
     if created_user:
         await referral_links.increase_users_count(name=command.args)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
+    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=ReplyKeyboardRemove())
     await send_user_agreement(to_message=message)
 
 
@@ -166,4 +161,4 @@ def register_start_command_handler(router: Router):
     # Пустая команда /start
     router.message.register(handle_empty_start_cmd, CommandStart(deep_link=False))
 
-    # router.callback_query.register(handle_check_subscribed_callback, F.data == 'check_subscribe')
+    router.callback_query.register(handle_check_subscribed_callback, F.data == 'check_subscribe')

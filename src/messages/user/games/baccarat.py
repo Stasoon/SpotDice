@@ -70,5 +70,6 @@ class BaccaratMessages(CreatableGamesMessages, BotGamesMessagesBase):
                 case BaccaratBettingOption.TIE.value:
                     text += 'ничья \n'
                 case _:
-                    text += 'пропустил ход'
+                    text += 'пропустил ход \n'
         return text
+

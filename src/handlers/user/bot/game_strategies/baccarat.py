@@ -230,7 +230,7 @@ class BaccaratStrategy(GameStrategy):
     @staticmethod
     async def start_game(bot: Bot, game: Game):
         """Когда все игроки собраны, вызывается функция для старта игры в баккара"""
-        time_on_move = 10 * 60
+        time_on_move = 5 * 60
         player_ids = await games.get_player_ids_of_game(game)
 
         text = BaccaratMessages.get_game_started()

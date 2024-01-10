@@ -6,7 +6,6 @@ from tortoise.exceptions import IntegrityError
 from .models import PromoCode, PromoCodeActivation, User
 
 
-
 def __generate_activation_code(length=8):
     """Генерирует код активации """
     characters = f'{string.ascii_letters}{string.digits}'  # Все заглавные буквы и цифры
@@ -66,28 +65,24 @@ async def is_user_activated_bonus(bonus, user):
 
 
 async def make_activation(bonus: PromoCode, user: User) -> bool:
-    if not bonus.is_active:
+    if not bonus.is_active or bonus.remaining_activations_count == 0 or user.balance > 0:
         return False
 
-    if user.balance > 0:
-        return False
-
-    if bonus.remaining_activations_count == 0:
-        bonus.is_active = False
-        await bonus.save()
-        return False
-
-    bonus.remaining_activations_count -= 1
-    await bonus.save()
-
-    if not await is_user_activated_bonus(user=user, bonus=bonus):
+    if not await is_user_activated_bonus(user=user, bonus=bonus):  # Если промокод не был активирован
         await PromoCodeActivation.create(user=user, bonus=bonus)
         user.balance += bonus.amount
         await user.save()
+
+        bonus.remaining_activations_count -= 1
+        if bonus.remaining_activations_count == 0:  # Если активации кончились, деактивируем
+            bonus.is_active = False
+        await bonus.save()
         return True
+
     return False
 
 
 async def deactivate_promo_code(bonus: PromoCode):
     bonus.is_active = False
     await bonus.save()
+

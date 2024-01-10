@@ -13,7 +13,7 @@ from src.database.transactions import bet_refunds
 async def delete_unconfirmed_games(bot: Bot):
 
     while True:
-        threshold_time = datetime.now() - timedelta(minutes=10)
+        threshold_time = datetime.now() - timedelta(minutes=2)
         unconfirmed_games: list[Game] = await Game.filter(
             status=GameStatus.WAIT_FOR_CONFIRM,
             time_started__lt=threshold_time
@@ -33,5 +33,7 @@ async def delete_unconfirmed_games(bot: Bot):
                         reply_markup=UserMenuKeyboards.get_main_menu()
                     )
                     await bet_refunds.make_bet_refund(player_id=player_id, amount=game.bet, game=game)
+                    await asyncio.sleep(0.05)
 
-        await asyncio.sleep(5*60)
+        await asyncio.sleep(2*60)
+

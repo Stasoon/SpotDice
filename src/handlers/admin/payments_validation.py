@@ -24,21 +24,23 @@ async def handle_validate_payment_callback(callback: CallbackQuery, callback_dat
         await callback.bot.send_message(
             callback_data.user_id,
             text=f'❌ Ваша заявка на {transaction_word} {callback_data.amount}₽ была отклонена. \n\n'
-                 f'Если считаете, что это ошибка - обратитесь к администратору: @helperdicy')
+                 f'Если считаете, что это ошибка - обратитесь к администратору: @helperdicy'
+        )
 
         # Если был вывод, возвращаем средства
         if callback_data.transaction_type == 'withdraw':
             await deposit_to_user(user_id=callback_data.user_id, amount=callback_data.amount, create_record=False)
+            return
         return
+    else:
+        await callback.bot.send_message(
+            callback_data.user_id,
+            text=f'✅ Ваша заявка на {transaction_word} {callback_data.amount}₽ была выполнена.'
+        )
 
-    await deposit_to_user(
-        user_id=callback_data.user_id, amount=callback_data.amount, create_record=False
-    )
-    await callback.bot.send_message(
-        callback_data.user_id, text=f'✅ Ваша заявка на {transaction_word} {callback_data.amount}₽ была выполнена.')
+        if callback_data.transaction_type == 'deposit':
+            await deposit_to_user(user_id=callback_data.user_id, amount=callback_data.amount, create_record=False)
 
-    if callback_data.transaction_type == 'deposit':
-        await deposit_to_user(callback_data.user_id, callback_data.amount, method=callback_data.method)
 
 
 def register_validate_request_handlers(router: Router):
@@ -47,3 +49,4 @@ def register_validate_request_handlers(router: Router):
         AdminValidatePaymentCallback.filter(),
         IsAdminFilter(True)
     )
+

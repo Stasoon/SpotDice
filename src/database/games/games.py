@@ -51,8 +51,8 @@ async def get_creator_of_game(game) -> User:
     return creator
 
 
-async def get_game_by_message_id(message_id: int) -> Game:
-    game = await Game.get_or_none(message_id=message_id)
+async def get_game_by_message_id(chat_id: int, message_id: int) -> Game:
+    game = await Game.filter(chat_id=chat_id, message_id=message_id).first()
     return game
 
 
@@ -171,3 +171,4 @@ async def set_wait_for_confirm_status(game: Game):
     utc_now = datetime.utcnow().replace(tzinfo=pytz.utc)
     game.time_started = utc_now
     await game.save()
+

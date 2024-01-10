@@ -35,7 +35,7 @@ class BaseTimer(ABC):
             await asyncio.sleep(self.step)
             await self.make_tick()
 
-            if self.timer and self.timer.timer_expiry <= 0:
+            if self.timer.timer_expiry <= 0:
                 self.is_stopped = True
                 break
 
@@ -49,10 +49,11 @@ class BaseTimer(ABC):
 
     @abstractmethod
     async def make_tick(self):
-        if self.is_stopped: return
+        if self.is_stopped:
+            return
 
-        self.timer = await Timer.get_or_none(chat_id=self.chat_id)
-        if self.timer:
+        timer = await Timer.get_or_none(chat_id=self.chat_id)
+        if timer and self.timer.id == timer.id:
             self.timer.timer_expiry -= self.step
             await self.timer.save()
         else:
@@ -81,4 +82,5 @@ class BaseTimer(ABC):
             return ''
 
         return self.format_seconds_to_time(self.timer.timer_expiry)
+
 

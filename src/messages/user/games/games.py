@@ -184,7 +184,7 @@ class UserPublicGameMessages(BotGamesMessagesBase):
         return result
 
     @staticmethod
-    async def get_game_in_chat_finish(
+    async def get_game_finish(
             game: Game, game_moves: list[PlayerScore], winners: List[User], win_amount: float | None
     ):
         # Получаем заголовок игры
@@ -221,3 +221,4 @@ class UserPublicGameMessages(BotGamesMessagesBase):
         return f'👤 {str(game.creator)} \n' \
                f'😞 Вы проиграли {format_float_to_rub_string(game.bet)} \n' \
                f'🍀 Возможно, в следующий раз повезёт'
+

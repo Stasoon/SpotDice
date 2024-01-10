@@ -111,7 +111,7 @@ async def handle_bands_button(message: Message):
 async def handle_cancel_band_creation(callback: CallbackQuery, state: FSMContext):
     await callback.message.delete()
     menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    await callback.message.edit_caption(**menu_message_data)
+    await callback.message.answer_photo(**menu_message_data)
     await state.clear()
 
 
@@ -124,8 +124,8 @@ async def handle_create_band_callback(callback: CallbackQuery, state: FSMContext
         await callback.message.edit_caption(**band_message)
         return
 
-    await callback.message.edit_text(
-        text='Введите название банды: ',
+    await callback.message.edit_caption(
+        caption='Введите название банды: ',
         reply_markup=BandsKeyboards.get_back_to_bands_menu()
     )
     await state.set_state(BandCreationStates.enter_band_title)
@@ -268,7 +268,9 @@ async def handle_consider_delete_band(callback: CallbackQuery, callback_data: Ba
     await bands.delete_band(band_id=callback_data.band_id)
     await callback.answer('Ваша банда была распущена.', show_alert=True)
     bands_menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    await callback.message.edit_text(**bands_menu_message_data)
+
+    await callback.message.delete()
+    await callback.message.answer_photo(**bands_menu_message_data)
 
 
 async def handle_band_opponents(callback: CallbackQuery, callback_data: BandCallback):
@@ -403,3 +405,4 @@ def register_bands_handlers(router: Router):
     #         (F.branch == 'bands') & (F.option.in_(['leagues_rules', 'rewards', 'bands_rules', 'city_rules']))
     #     )
     # )
+

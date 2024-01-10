@@ -11,7 +11,7 @@ from src.misc import GameCategory
 from src.utils import logger
 
 
-async def accrue_winnings(winner_telegram_id: int, amount: float, game_category: GameCategory) -> float:
+async def accrue_winnings(winner_telegram_id: int, amount: float, game_category: GameCategory) -> Decimal:
     """
     Начисление выигрыша победителю и процента пригласившему.
     Возвращает выигрыш с учётом комиссии
@@ -27,13 +27,17 @@ async def accrue_winnings(winner_telegram_id: int, amount: float, game_category:
         user.balance += amount_with_commission
         await user.save()
         await Winning.create(user=user, amount=amount_with_commission, game_category=game_category)
+    except Exception as e:
+        logger.error(e)
 
+    try:
         # увеличиваем баланс того, кто пригласил
         await accrue_referral_bonus(referred_user_id=winner_telegram_id, game_winning_amount=amount_with_commission)
         await add_band_win(user_id=winner_telegram_id, amount=amount_with_commission)
-        return float(amount_with_commission)
     except Exception as e:
         logger.error(e)
+
+    return amount_with_commission
 
 
 async def get_top_winners_by_amount(category: GameCategory, days_back: int = None, limit: int = 3) -> list[User]:
@@ -69,3 +73,4 @@ async def get_top_winners_by_count(days_back: int = None, limit: int = 10) -> li
     ).order_by('-wins_count').limit(limit)
 
     return top_players
+

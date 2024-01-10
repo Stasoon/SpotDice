@@ -2,7 +2,7 @@ import asyncio
 
 from aiogram import Router, F, Bot
 from aiogram.exceptions import TelegramBadRequest
-from aiogram.types import Message
+from aiogram.types import Message, ReplyKeyboardRemove
 
 from src.database import games, Game, transactions, PlayerScore, User
 from src.database.games import game_scores
@@ -47,10 +47,12 @@ class GameTimer(BaseTimer):
     async def on_time_left(self):
         try:
             await self.bot.delete_message(chat_id=self.timer.chat_id, message_id=self.timer.message_id)
+            await self.bot.send_message(
+                chat_id=self.timer.chat_id, text="Время на ход вышло!", reply_markup=ReplyKeyboardRemove()
+            )
         except TelegramBadRequest:
             pass
 
-        await self.bot.send_message(chat_id=self.timer.chat_id, text="Время на ход вышло!")
         await game_scores.add_player_move_if_not_moved(self.game, self.timer.chat_id, move_value=0)
 
         if await game_scores.is_all_players_moved(self.game):
@@ -63,7 +65,7 @@ class BasicGameStrategy(GameStrategy):
 
     @staticmethod
     async def start_game(bot: Bot, game: Game):
-        time_on_move = 10*60
+        time_on_move = 2*60
         msg_instance = get_message_instance_by_game_type(game_type=game.game_type)
         player_ids = await games.get_player_ids_of_game(game)
 
@@ -99,7 +101,7 @@ class BasicGameStrategy(GameStrategy):
     @staticmethod
     async def __accrue_players_winnings_and_get_amount(game: Game, win_coefficient: float, winners: list[User]) -> float:
         # Начисляем выигрыши победителям
-        winning_with_commission = None
+        winning_with_commission = game.bet * win_coefficient
         for winner in winners:
             winning_with_commission = await transactions.accrue_winnings(
                 game_category=game.category, winner_telegram_id=winner.telegram_id,
@@ -112,7 +114,7 @@ class BasicGameStrategy(GameStrategy):
             bot: Bot, game: Game, game_moves: list[PlayerScore], winning_amount: float, winners: list[User]
     ):
         # Отправляем результат игры в чат
-        text = await UserPublicGameMessages.get_game_in_chat_finish(
+        text = await UserPublicGameMessages.get_game_finish(
             game=game, winners=winners, game_moves=game_moves, win_amount=winning_amount
         )
         # Отправляем результат игрокам
@@ -155,7 +157,8 @@ class BasicGameStrategy(GameStrategy):
             winners = [await move.player for move in game_moves if move.value == max_move.value]
             # начисляем выигрыши
             winning_with_commission = await cls.__accrue_players_winnings_and_get_amount(
-                game=game, winners=winners, win_coefficient=win_coefficient)
+                game=game, winners=winners, win_coefficient=win_coefficient
+            )
 
         # Ждём окончания анимации
         seconds_to_wait = 3
@@ -205,9 +208,10 @@ class BasicGameStrategy(GameStrategy):
             )
 
         if len(game_moves) + 1 != game.max_players:
-            await move_message.answer('Твой ход принят. Ожидай своего соперника.')
+            await move_message.answer('Твой ход принят. Ожидай своего соперника.', reply_markup=ReplyKeyboardRemove())
 
     @classmethod
     def register_moves_handlers(cls, router: Router):
         router.message.register(cls.handle_game_move_message, F.dice)
+
 

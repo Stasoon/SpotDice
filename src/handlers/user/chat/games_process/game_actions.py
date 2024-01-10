@@ -63,7 +63,7 @@ async def process_player_move(game: Game, message: Message):
 
 async def __accrue_players_winnings_and_get_amount(game: Game, win_coefficient: float, winners: list[User]) -> float:
     # Начисляем выигрыши победителям
-    winning_with_commission = None
+    winning_with_commission = (game.bet * win_coefficient) / len(winners)
 
     for winner in winners:
         winning_with_commission = await transactions.accrue_winnings(
@@ -95,12 +95,13 @@ async def finish_game(game: Game, message: Message):
         winners = [move.player for move in game_moves if move.value == max_move.value]
         # начисляем выигрыши
         winning_with_commission = await __accrue_players_winnings_and_get_amount(
-            game=game, winners=winners, win_coefficient=win_coefficient)
+            game=game, winners=winners, win_coefficient=win_coefficient
+        )
 
     seconds_to_wait = 3
     await asyncio.sleep(seconds_to_wait)
 
-    text = await UserPublicGameMessages.get_game_in_chat_finish(
+    text = await UserPublicGameMessages.get_game_finish(
         game=game, game_moves=game_moves, winners=winners, win_amount=winning_with_commission
     )
     await message.answer(text=text, reply_markup=ReplyKeyboardRemove(), parse_mode='HTML')
@@ -111,13 +112,16 @@ async def finish_game(game: Game, message: Message):
 
 
 async def handle_game_move_message(message: Message):
-    game = await games.get_user_unfinished_game(message.from_user.id)
+    game = await games.get_user_active_game(message.from_user.id)
     dice = message.dice
 
     # Если игрок есть в игре и тип эмодзи соответствует
-    if dice and game and message.reply_to_message \
-            and message.reply_to_message.message_id == game.message_id and \
-            dice.emoji == game.game_type.value:
+    if (
+        dice and game
+        and message.reply_to_message
+        and message.reply_to_message.message_id == game.message_id
+        and dice.emoji == game.game_type.value
+    ):
         await process_player_move(game, message)
 
 
@@ -137,3 +141,4 @@ async def handle_join_game_in_chat_callback(callback: CallbackQuery, callback_da
 def register_game_actions_handlers(router: Router):
     router.message.register(handle_game_move_message)
     router.callback_query.register(handle_join_game_in_chat_callback, GamesCallback.filter(F.action == 'join'))
+
