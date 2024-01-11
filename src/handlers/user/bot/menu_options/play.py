@@ -1,17 +1,18 @@
 from aiogram import Router, F
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.fsm.context import FSMContext
-from aiogram.types import CallbackQuery, Message
+from aiogram.types import CallbackQuery, Message, InputMediaPhoto
 
 from src.database import users, games, transactions
 from src.handlers.user.chat.chat import send_game_created_in_bot_notification
 from src.keyboards.user import UserBotGameKeyboards, UserMenuKeyboards
 from src.messages import get_full_game_info_text
 from src.messages.user import UserMenuMessages, UserPrivateGameMessages, GameErrors
-from src.utils.choose_game_messages import get_message_instance_by_game_type, get_game_category_message_instance
+from src.messages.user.games.choose_game_messages import get_message_instance_by_game_type, get_game_category_message_instance
 from src.utils.game_validations import validate_and_extract_bet_amount, check_rights_and_cancel_game
 from src.misc import MenuNavigationCallback, GamesCallback, GameCategory, GameType, GamePagesNavigationCallback
 from src.misc.states import EnterBetStates
+from src.utils import logger
 
 
 # region Utils
@@ -38,24 +39,31 @@ async def show_game_category(
         await to_callback.answer(UserPrivateGameMessages.get_its_last_page())
         return
 
-    message_instance = get_game_category_message_instance(game_category=game_category)
     player = await users.get_user_or_none(telegram_id=to_callback.from_user.id)
     if not player:
         return
 
+    message_instance = get_game_category_message_instance(game_category=game_category)
     text = message_instance.get_category_description(player_name=player.name)
+    photo = message_instance.get_category_photo()
     markup = await UserBotGameKeyboards.get_game_category(
         available_games=available_games, category=game_category, current_page_num=page_num
     )
 
     try:
-        await to_callback.message.edit_text(text=text, reply_markup=markup)
-    except Exception:
+        if to_callback.message.photo:
+            await to_callback.message.edit_media(media=InputMediaPhoto(media=photo, caption=text), reply_markup=markup)
+        else:
+            await to_callback.message.answer_photo(photo=photo, caption=text, reply_markup=markup)
+            await to_callback.message.delete()
+    except TelegramBadRequest:
         pass
+    except Exception as e:
+        logger.error(e)
 
 
 async def show_basic_game_types(to_message: Message):
-    await to_message.edit_text(
+    await to_message.edit_caption(
         text=UserPrivateGameMessages.get_choose_game_type(),
         reply_markup=UserBotGameKeyboards.get_basic_game_types(),
         parse_mode='HTML'
@@ -83,7 +91,10 @@ async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_c
 async def handle_play_button(message: Message, state: FSMContext):
     """Обработка кнопки Играть из меню"""
     await state.clear()
-    await message.answer(**(await get_play_message_data(message.from_user.id)))
+    text = UserMenuMessages.get_play_menu(await users.get_user_or_none(message.from_user.id))
+    reply_markup = UserBotGameKeyboards.get_play_menu()
+    photo = UserMenuMessages.get_play_menu_photo()
+    await message.answer_photo(photo=photo, caption=text, reply_markup=reply_markup)
 
 
 async def handle_game_category_callback(callback: CallbackQuery, callback_data: GamesCallback, state: FSMContext):
@@ -96,8 +107,8 @@ async def handle_game_category_callback(callback: CallbackQuery, callback_data: 
 async def handle_game_category_stats_callback(callback: CallbackQuery, callback_data: GamesCallback):
     """Показывает статистику по выбранной категории игр"""
     game_category = callback_data.game_category
-    await callback.message.edit_text(
-        text=await UserPrivateGameMessages.get_game_category_stats(game_category),
+    await callback.message.edit_caption(
+        caption=await UserPrivateGameMessages.get_game_category_stats(game_category),
         reply_markup=UserBotGameKeyboards.get_back_from_stats(game_category),
         parse_mode='HTML'
     )
@@ -215,7 +226,15 @@ async def handle_show_game_callback(callback: CallbackQuery, callback_data: Game
 
 
 async def handle_back_in_play_callback(callback: CallbackQuery):
-    await callback.message.edit_text(**(await get_play_message_data(callback.from_user.id)))
+    text = UserMenuMessages.get_play_menu(await users.get_user_or_none(callback.from_user.id))
+    reply_markup = UserBotGameKeyboards.get_play_menu()
+    photo = UserMenuMessages.get_play_menu_photo()
+
+    if callback.message.photo:
+        await callback.message.edit_media(media=InputMediaPhoto(media=photo, caption=text), reply_markup=reply_markup)
+    else:
+        await callback.message.answer_photo(photo=photo, caption=text, reply_markup=reply_markup)
+        await callback.message.delete()
 
 
 def register_play_handlers(router: Router):

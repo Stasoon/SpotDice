@@ -6,7 +6,6 @@ from aiogram.enums import ChatAction
 from aiogram.exceptions import TelegramBadRequest
 from aiogram.types import CallbackQuery, ReplyKeyboardRemove
 
-from settings import Config
 from src.database import Game, games, users, transactions
 from src.database.games import playing_cards, game_scores
 from src.handlers.user.bot.game_strategies.game_strategy import GameStrategy

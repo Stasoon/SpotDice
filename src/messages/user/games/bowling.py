@@ -1,16 +1,10 @@
 import random
 
-from src.messages import UserPrivateGameMessages
-from src.messages.user.games.creatable_game_messages_base import CreatableGamesMessages
-from src.messages.user.games.game_messages_base import BotGamesMessagesBase
+from src.messages.user.games.game_messages_abc import CreatableGamesMessages, BotGamesMessagesBase
 from src.utils.text_utils import format_float_to_rub_string
 
 
 class BowlingMessages(BotGamesMessagesBase, CreatableGamesMessages):
-
-    @staticmethod
-    def get_category_description(player_name: str) -> str:
-         pass
 
     @staticmethod
     def ask_for_bet_amount(player_name: str) -> str:
@@ -26,7 +20,7 @@ class BowlingMessages(BotGamesMessagesBase, CreatableGamesMessages):
 
     @staticmethod
     def get_game_created(game_number: int):
-        return UserPrivateGameMessages.get_game_created(game_number=game_number)
+        return CreatableGamesMessages.get_game_created(game_number=game_number)
 
     @staticmethod
     def get_game_started():

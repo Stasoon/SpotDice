@@ -1,25 +1,27 @@
 import random
 
-from src.messages import UserPrivateGameMessages
-from src.messages.user.games.creatable_game_messages_base import CreatableGamesMessages
-from src.messages.user.games.game_messages_base import BotGamesMessagesBase
+from src.messages.user.games.game_messages_abc import CreatableGamesMessages, BotGamesMessagesBase
 from src.utils.text_utils import format_float_to_rub_string
 
 
 class DiceMessages(BotGamesMessagesBase, CreatableGamesMessages):
+
+    @staticmethod
+    def ask_for_bet_amount(player_name: str) -> str:
+        texts = (
+            'DICY: Да, ты все верно понял! Это игра имени меня! \nУдачи тебе!',
+            'DICY: В игре в кости главное сосредоточиться и собрать всю удачу в кулак!',
+            'DICY: Добро пожаловать в главную игру — кости! \nСкажу по секрету, мне в нее всегда везет.',
+        )
+        return random.choice(texts)
+
+    @staticmethod
+    def get_game_created(game_number: int):
+        return CreatableGamesMessages.get_game_created(game_number=game_number)
+
     @staticmethod
     def get_game_started():
         return 'Игра началась. \nБросай кости!'
-
-    @staticmethod
-    def get_tie():
-        texts = (
-            'DICY: В этой схватке сразились два равных игрока, ничья! \nСтавки возвращены.',
-            'DICY: Ставки возвращаются, у игроков одинаковый счёт! \nСразитесь снова, чтобы выявить победителя.',
-            'DICY: Все так хотели выиграть, что в итоге случилась ничья. Ставки возвращены.',
-            'DICY: Ничья! Так как у игроков одинаковый счет, ставки возвращаются.',
-        )
-        return random.choice(texts)
 
     @staticmethod
     def get_player_won(player_name: str = 'Игрок', win_amount: float = 0):
@@ -43,18 +45,11 @@ class DiceMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return random.choice(texts)
 
     @staticmethod
-    def get_category_description(player_name: str) -> str:
-        pass
-
-    @staticmethod
-    def ask_for_bet_amount(player_name: str) -> str:
+    def get_tie():
         texts = (
-            'DICY: Да, ты все верно понял! Это игра имени меня! \nУдачи тебе!',
-            'DICY: В игре в кости главное сосредоточиться и собрать всю удачу в кулак!',
-            'DICY: Добро пожаловать в главную игру — кости! \nСкажу по секрету, мне в нее всегда везет.',
+            'DICY: В этой схватке сразились два равных игрока, ничья! \nСтавки возвращены.',
+            'DICY: Ставки возвращаются, у игроков одинаковый счёт! \nСразитесь снова, чтобы выявить победителя.',
+            'DICY: Все так хотели выиграть, что в итоге случилась ничья. Ставки возвращены.',
+            'DICY: Ничья! Так как у игроков одинаковый счет, ставки возвращаются.',
         )
         return random.choice(texts)
-
-    @staticmethod
-    def get_game_created(game_number: int):
-        return UserPrivateGameMessages.get_game_created(game_number=game_number)

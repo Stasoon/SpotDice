@@ -10,7 +10,7 @@ from src.handlers.user.bot.game_strategies.game_strategy import GameStrategy
 from src.keyboards import UserMenuKeyboards, UserBotGameKeyboards
 from src.messages import UserPublicGameMessages
 from src.misc import GameStatus
-from src.utils.choose_game_messages import get_message_instance_by_game_type
+from src.messages.user.games.choose_game_messages import get_message_instance_by_game_type
 from src.utils.game_messages_sender import GameMessageSender
 from src.utils.timer import BaseTimer
 
@@ -25,7 +25,7 @@ class GameTimer(BaseTimer):
         self.template = text_template
 
     @classmethod
-    async def stop(cls, bot: Bot, chat_id: int):
+    async def stop(cls, chat_id: int, bot: Bot):
         try:
             timer = await super(GameTimer, cls).stop(chat_id)
             await bot.delete_message(chat_id=timer.chat_id, message_id=timer.message_id)
@@ -170,6 +170,10 @@ class BasicGameStrategy(GameStrategy):
 
     @classmethod
     async def handle_game_move_message(cls, message: Message):
+        if message.forward_from:
+            await message.answer('❌ Нельзя пересылать сообщения! Воспользуйтесь клавиатурой.')
+            return
+
         game = await games.get_user_unfinished_game(message.from_user.id)
         if not game:
             return 

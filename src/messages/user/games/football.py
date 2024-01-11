@@ -1,8 +1,7 @@
 import random
 
 from src.utils.text_utils import format_float_to_rub_string
-from .creatable_game_messages_base import CreatableGamesMessages
-from .game_messages_base import BotGamesMessagesBase
+from .game_messages_abc import CreatableGamesMessages, BotGamesMessagesBase
 
 
 class FootballMessages(BotGamesMessagesBase, CreatableGamesMessages):
@@ -16,17 +15,17 @@ class FootballMessages(BotGamesMessagesBase, CreatableGamesMessages):
         )
         return random.choice(texts).format(game_number=game_number)
 
-    @staticmethod
-    def get_category_description(player_name: str) -> str:
-        texts = (
-            'Финт, финт и еще раз финт! Добро пожаловать на футбольное поле!',
-            'Сладкий звук попадания в штангу разносится на весь стадион. \nТы зашел на футбольное поле!',
-            'Гетры повыше, шорты пониже! \nИ ты готов для игры в футбол',
-            'DICY: Анкара Месси, анкара Месси, Месси! Скоро и твою фамилию будут так кричать!',
-            'DICY: Что может быть лучше запаха свежего газона футбольного поля? Вот и я не знаю',
-            'DICY: Шнурки завяжи! А то споткнешься и сразу проиграешь.',
-        )
-        return random.choice(texts)
+    # @staticmethod
+    # def get_category_description(player_name: str) -> str:
+    #     texts = (
+    #         'Финт, финт и еще раз финт! Добро пожаловать на футбольное поле!',
+    #         'Сладкий звук попадания в штангу разносится на весь стадион. \nТы зашел на футбольное поле!',
+    #         'Гетры повыше, шорты пониже! \nИ ты готов для игры в футбол',
+    #         'DICY: Анкара Месси, анкара Месси, Месси! Скоро и твою фамилию будут так кричать!',
+    #         'DICY: Что может быть лучше запаха свежего газона футбольного поля? Вот и я не знаю',
+    #         'DICY: Шнурки завяжи! А то споткнешься и сразу проиграешь.',
+    #     )
+    #     return random.choice(texts)
 
     @staticmethod
     def ask_for_bet_amount(player_name: str) -> str:

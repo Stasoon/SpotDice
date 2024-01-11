@@ -1,10 +1,9 @@
-from typing import List
+from typing import List, Type
 
 from aiogram import html
 
 from src.database import games, users, Game, PlayerScore, get_top_winners_by_amount, User
-from src.messages.user.games.creatable_game_messages_base import CreatableGamesMessages
-from src.messages.user.games.game_messages_base import BotGamesMessagesBase
+from src.messages.user.games.game_messages_abc import CreatableGamesMessages
 from src.utils.text_utils import format_float_to_rub_string
 from src.misc import GameCategory
 from settings import Config
@@ -59,28 +58,8 @@ async def _get_game_participants(game: Game):
 # endregion Utils
 
 
-class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
+class UserPrivateGameMessages:
     """Содержит функции для получения текстов сообщений, связанных с играми и отправляемых в боте"""
-
-    @staticmethod
-    def get_game_started():
-        return 'Игра началась!'
-
-    @staticmethod
-    def get_category_description(player_name: str) -> str:
-        return (
-            "<b>🎲 Games — 6 игровых режимов:</b> Кости, Дартс, Баскетбол, Слоты, Боулинг, Футбол \n\n"
-            "Твоя задача в них: набрать больше очков, чем твой соперник и победа будет за тобой. \n"
-            "Переходи к игровым столам, нажав кнопку «➕ Создать»"
-        )
-
-    @staticmethod
-    def ask_for_bet_amount(player_name: str) -> str:
-        pass
-
-    @staticmethod
-    def get_game_category(category: GameCategory) -> str:
-        return f'{category.value} \n'
 
     @staticmethod
     async def get_game_category_stats(category: GameCategory) -> str:
@@ -107,7 +86,7 @@ class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
 
     @staticmethod
     async def enter_bet_amount(
-            user_id: int, game_type_name: str, message_instance: CreatableGamesMessages = None
+            user_id: int, game_type_name: str, message_instance: Type[CreatableGamesMessages] = None
     ) -> str:
         """Просьба ввести ставку"""
         user = await users.get_user_or_none(user_id)
@@ -126,11 +105,6 @@ class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
                f'ℹ Введите размер ставки или нажмите Отмена'
 
     @staticmethod
-    def get_game_created(game_number: int) -> str:
-        return f'✅ Игра №{game_number} создана. \n\n' \
-               f'⏰ Скоро кто-то присоединится...'
-
-    @staticmethod
     def get_game_successfully_canceled():
         return 'Игра отменена'
 
@@ -139,24 +113,8 @@ class UserPrivateGameMessages(CreatableGamesMessages, BotGamesMessagesBase):
         return 'Это последняя страница.'
 
 
-class UserPublicGameMessages(BotGamesMessagesBase):
+class UserPublicGameMessages:
     """Содержит функции для получения текстов сообщений, связанных с играми и отправляемых в чаты"""
-
-    @staticmethod
-    def get_game_started() -> str:
-        return 'Нажмите на клавиатуру, чтобы походить'
-
-    @staticmethod
-    def get_tie():
-        return
-
-    @staticmethod
-    def get_player_loose():
-        return
-
-    @staticmethod
-    def get_player_won(player_name: str = 'Игрок', win_amount: float = 0):
-        return
 
     @staticmethod
     async def get_game_created_in_bot_notification(game: Game, bot_username: str) -> str:

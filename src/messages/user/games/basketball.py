@@ -1,7 +1,6 @@
 import random
 
-from .creatable_game_messages_base import CreatableGamesMessages
-from .game_messages_base import BotGamesMessagesBase
+from .game_messages_abc import CreatableGamesMessages, BotGamesMessagesBase
 
 
 class BasketballMessages(BotGamesMessagesBase, CreatableGamesMessages):
@@ -18,18 +17,6 @@ class BasketballMessages(BotGamesMessagesBase, CreatableGamesMessages):
             'Пока ты ждешь соперника, в мыслях ты уже представляешь, куда потратишь деньги с выигрыша.',
         )
         return random.choice(texts).format(game_number=game_number)
-
-    @staticmethod
-    def get_category_description(player_name: str) -> str:
-        texts = (
-            'Стук мяча о паркет, скрип кроссовок... Да, ты на баскетбольной площадке.',
-            'Добро пожаловать на баскетбольную площадку! Уверен в своем броске? Тогда ты в верном месте.',
-            'Ты слышишь этот сладкий звук попадания мяча в сетку кольца. Верно, ты на баскетбольной площадке.',
-            'DICY: Ну что, новый Майкл Джордан, готов закидывать трёхочковые? Сейчас это проверим.',
-            'DICY: Думаешь, сможешь составить другим игрокам конкуренцию? Ты до кольца то докинешь?',
-            'DICY: Готов поспорить на то, что и одного броска не закинешь! Ради интереса, так уж и быть, выйди на площадку.',
-        )
-        return random.choice(texts)
 
     @staticmethod
     def ask_for_bet_amount(player_name: str) -> str:

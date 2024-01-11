@@ -1,12 +1,24 @@
 import random
 
-from src.messages import UserPrivateGameMessages
-from src.messages.user.games.creatable_game_messages_base import CreatableGamesMessages
-from src.messages.user.games.game_messages_base import BotGamesMessagesBase
+from src.messages.user.games.game_messages_abc import CreatableGamesMessages, BotGamesMessagesBase
 from src.utils.text_utils import format_float_to_rub_string
 
 
 class DartsMessages(BotGamesMessagesBase, CreatableGamesMessages):
+
+    @staticmethod
+    def ask_for_bet_amount(player_name: str) -> str:
+        texts = (
+            'Пришла пора вспомнить, как ты в отеле на юге попадал в яблочко. ',
+            'DICY: Пора собрать всю твою удачу и выбить все утроение 20!',
+            'DICY: Перед броском дротика тебе надо глубоко вздохнуть и расслабиться. \nТогда точно попадешь!',
+            'DICY: Давай, у тебя 3 попытки, чтобы попасть в яблочко! \nВерю в тебя.',
+        )
+        return random.choice(texts)
+
+    @staticmethod
+    def get_game_created(game_number: int):
+        return CreatableGamesMessages.get_game_created(game_number=game_number)
 
     @staticmethod
     def get_game_started():
@@ -47,21 +59,3 @@ class DartsMessages(BotGamesMessagesBase, CreatableGamesMessages):
             'DICY: Окей, иногда можно и дать насладится вкусом победы и другому игроку.',
         )
         return random.choice(texts)
-
-    @staticmethod
-    def get_category_description(player_name: str) -> str:
-        pass
-
-    @staticmethod
-    def ask_for_bet_amount(player_name: str) -> str:
-        texts = (
-            'Пришла пора вспомнить, как ты в отеле на юге попадал в яблочко. ',
-            'DICY: Пора собрать всю твою удачу и выбить все утроение 20!',
-            'DICY: Перед броском дротика тебе надо глубоко вздохнуть и расслабиться. \nТогда точно попадешь!',
-            'DICY: Давай, у тебя 3 попытки, чтобы попасть в яблочко! \nВерю в тебя.',
-        )
-        return random.choice(texts)
-
-    @staticmethod
-    def get_game_created(game_number: int):
-        return UserPrivateGameMessages.get_game_created(game_number=game_number)

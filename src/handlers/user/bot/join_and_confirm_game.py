@@ -6,7 +6,7 @@ from settings import Config
 from src.database import Game, transactions
 from src.database.games import games
 from src.database.models import GameStartConfirm
-from src.keyboards import UserBotGameKeyboards, UserMenuKeyboards
+from src.keyboards import UserBotGameKeyboards
 from src.misc import GamesCallback, GameCategory, GameStatus
 from src.utils.game_validations import validate_join_game_request
 

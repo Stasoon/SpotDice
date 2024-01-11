@@ -39,6 +39,10 @@ class UserMenuMessages:
         return f'👤 Вы в игровом меню \n🪙 Баланс: {balance_str} \n\n/deposit — нажми, чтобы пополнить баланс'
 
     @staticmethod
+    def get_play_menu_photo() -> str:
+        return 'https://telegra.ph/file/b2d6791839dffc50bae8b.png'
+
+    @staticmethod
     def get_events() -> str:
         return '📰 Наши события'
 
@@ -86,7 +90,7 @@ class UserMenuMessages:
 
         band_text = '— \n' if not user_band else f'<code>{user_band.title}</code> \n'
         band_text = f"🕸 Банда: {band_text}"
-        rank_text = f"⚔ Твой ранг: {BandLeague.CROOKS if not user_band else user_band.league} \n"
+        rank_text = f"⚔ Твоя лига: {BandLeague.CROOKS if not user_band else user_band.league} \n"
 
         return (
             f'🌀 ID: {html.code(user.telegram_id)} \n'

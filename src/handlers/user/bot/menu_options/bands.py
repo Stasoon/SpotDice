@@ -109,9 +109,16 @@ async def handle_bands_button(message: Message):
 
 # МОЯ БАНДА
 async def handle_cancel_band_creation(callback: CallbackQuery, state: FSMContext):
-    await callback.message.delete()
-    menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    await callback.message.answer_photo(**menu_message_data)
+    user_band = await bands.get_user_band(telegram_id=callback.from_user.id)
+    photo = BandsMessages.get_bands_menu_photo()
+    text = BandsMessages.get_bands_menu()
+    markup = BandsKeyboards.get_bands_menu(user_band=user_band)
+
+    if callback.message.photo:
+        await callback.message.edit_media(media=InputMediaPhoto(media=photo, caption=text), reply_markup=markup)
+    else:
+        await callback.message.answer_photo(photo=photo, caption=text, reply_markup=markup)
+        await callback.message.delete()
     await state.clear()
 
 
@@ -146,13 +153,16 @@ async def handle_new_band_title_message(message: Message, state: FSMContext):
 
 
 async def handle_back_to_bands_menu(callback: CallbackQuery):
-    menu_message_data = await __get_bands_menu_message_data(for_user_id=callback.from_user.id)
-    try:
+    text = BandsMessages.get_bands_menu()
+    photo = BandsMessages.get_bands_menu_photo()
+    user_band = await bands.get_user_band(telegram_id=callback.from_user.id)
+    markup = BandsKeyboards.get_bands_menu(user_band=user_band)
+
+    if callback.message.photo:
+        await callback.message.edit_media(media=InputMediaPhoto(media=photo, caption=text), reply_markup=markup)
+    else:
+        await callback.message.answer_photo(caption=text, photo=photo, reply_markup=markup)
         await callback.message.delete()
-        await callback.message.answer_photo(**menu_message_data)
-    except TelegramBadRequest:
-        await callback.message.delete()
-        await callback.message.answer_photo(**menu_message_data)
 
 
 async def handle_show_my_band(callback: CallbackQuery, callback_data: BandCallback):
@@ -302,8 +312,7 @@ async def handle_city_callback(callback: CallbackQuery):
     photo_url = BandsMessages.get_global_map_photo()
 
     if callback.message.photo:
-        await callback.message.edit_media(media=InputMediaPhoto(media=photo_url))
-        await callback.message.edit_caption(caption=text, reply_markup=markup)
+        await callback.message.edit_media(media=InputMediaPhoto(media=photo_url, caption=text), reply_markup=markup)
     else:
         await callback.message.delete()
         await callback.message.answer_photo(caption=text, reply_markup=markup, photo=photo_url)
@@ -320,11 +329,9 @@ async def handle_band_map_callback(callback: CallbackQuery, callback_data: Bands
         await bands.get_bands_rating_in_league(league=callback_data.league, count=6)
     ]
 
-    await callback.message.edit_media(media=InputMediaPhoto(media=map_photo))
-    await callback.message.edit_caption(
-        reply_markup=BandsKeyboards.get_city(current_league=callback_data.league),
-        caption=BandsMessages.get_league_map_description(league=callback_data.league, band_names=band_names)
-    )
+    text = BandsMessages.get_league_map_description(league=callback_data.league, band_names=band_names)
+    markup = BandsKeyboards.get_city(current_league=callback_data.league)
+    await callback.message.edit_media(media=InputMediaPhoto(media=map_photo, caption=text), reply_markup=markup)
 
 
 # # ИНФОРМАЦИЯ

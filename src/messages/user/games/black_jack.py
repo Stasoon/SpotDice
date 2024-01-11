@@ -1,16 +1,14 @@
 import random
 
 from src.utils.text_utils import format_float_to_rub_string
-from .creatable_game_messages_base import CreatableGamesMessages
-from .game_messages_base import BotGamesMessagesBase
+from .game_messages_abc import GameCategoryMessages, BotGamesMessagesBase, CreatableGamesMessages
 
 
-class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages):
+class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages, GameCategoryMessages):
 
     @staticmethod
-    def get_game_created(game_number: int):
-        return f'♠ Супер, игра №{game_number} создана! \n\n' \
-               f'Скоро к тебе за стол сядет и другой гость нашего заведения. Удачи!'
+    def get_category_photo() -> str:
+        return 'https://telegra.ph/file/2806e7b6f70fe443f6d87.png'
 
     @staticmethod
     def get_category_description(player_name: str) -> str:
@@ -25,6 +23,11 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages):
             '"А что если прямо сейчас поставить всё и выйти победителем?" — именно с этими мыслями ты заходишь в просторный зал казино.',
         )
         return f"♠ BlackJack \n\n{random.choice(texts).format(player_name=player_name)}"
+
+    @staticmethod
+    def get_game_created(game_number: int):
+        return f'♠ Супер, игра №{game_number} создана! \n\n' \
+               f'Скоро к тебе за стол сядет и другой гость нашего заведения. Удачи!'
 
     @staticmethod
     def ask_for_bet_amount(player_name: str) -> str:
@@ -91,7 +94,6 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages):
     def get_player_won(player_name: str = 'Игрок', win_amount: float = 0) -> str:
         texts = (
             'Ты победил! Поздравляю, вот твой выигрыш: {win_amount}, диллер указывает на теперь уже твою горсть фишек',
-            #'{player_name} оказался сильнее! Или просто везучее. В любом случае держи свой выигрыш, - говорит диллер и ты гребешь фишки на сумму {win_amount}.',
             'ПО-БЕ-ДА! Бери свои фишки и радуйся, пока можешь - говорит тебе диллер. \n\nВыигрыш: {win_amount}',
             'DICY: {player_name}, я в тебе и не сомневался, даже до нашего знакомства знал, что ты король. \n\nТвой выигрыш равен {win_amount}',
             'DICY: А вот и мой чемпион! {player_name}, поздравляю тебя, бери свои фишки на сумму {win_amount}',
