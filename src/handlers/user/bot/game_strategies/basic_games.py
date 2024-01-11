@@ -170,7 +170,7 @@ class BasicGameStrategy(GameStrategy):
 
     @classmethod
     async def handle_game_move_message(cls, message: Message):
-        if message.forward_from:
+        if message.forward_from or message.forward_sender_name or message.forward_signature:
             await message.answer('❌ Нельзя пересылать сообщения! Воспользуйтесь клавиатурой.')
             return
 

@@ -21,6 +21,10 @@ class DartsMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return CreatableGamesMessages.get_game_created(game_number=game_number)
 
     @staticmethod
+    def get_ask_for_bet_photo() -> str:
+        return 'https://telegra.ph/file/628dc2d1249589bcd4ea4.png'
+
+    @staticmethod
     def get_game_started():
         texts = (
             'DICY: Давай, покажи своё мастерство!',

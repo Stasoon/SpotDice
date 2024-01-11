@@ -64,7 +64,7 @@ async def show_game_category(
 
 async def show_basic_game_types(to_message: Message):
     await to_message.edit_caption(
-        text=UserPrivateGameMessages.get_choose_game_type(),
+        caption=UserPrivateGameMessages.get_choose_game_type(),
         reply_markup=UserBotGameKeyboards.get_basic_game_types(),
         parse_mode='HTML'
     )
@@ -78,9 +78,11 @@ async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_c
     text = await UserPrivateGameMessages.enter_bet_amount(
         message_instance=message_instance, user_id=callback.from_user.id, game_type_name=game_type.get_full_name()
     )
-    await message.answer(
-        text=text, reply_markup=UserBotGameKeyboards.get_cancel_bet_entering(game_category), parse_mode='HTML'
-    )
+    photo = message_instance.get_ask_for_bet_photo()
+    markup = UserBotGameKeyboards.get_cancel_bet_entering(game_category)
+
+    if photo: await message.answer_photo(photo=photo, caption=text, reply_markup=markup)
+    else: await message.answer(text=text, reply_markup=markup)
 
 
 # endregion
@@ -216,8 +218,8 @@ async def handle_bet_amount_message(message: Message, state: FSMContext):
 async def handle_show_game_callback(callback: CallbackQuery, callback_data: GamesCallback):
     """Обработка нажатия на доступную игру"""
     game = await games.get_game_obj(callback_data.game_number)
-    await callback.message.edit_text(
-        text=await get_full_game_info_text(game),
+    await callback.message.edit_caption(
+        caption=await get_full_game_info_text(game),
         reply_markup=await UserBotGameKeyboards.get_join_game_or_back(
             user_id=callback.from_user.id, game=game
         ),

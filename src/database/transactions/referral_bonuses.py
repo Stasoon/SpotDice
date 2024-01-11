@@ -6,7 +6,7 @@ from ..models import ReferralBonus
 from ..users import get_referrer_id_of_user, get_user_or_none, get_referrals_count_by_telegram_id
 
 
-async def calculate_referral_bonus_percent(user_id: int):
+async def calculate_referral_bonus_percent(user_id: int) -> float:
     referrals_count = await get_referrals_count_by_telegram_id(user_id=user_id)
 
     if referrals_count < 5:
@@ -33,7 +33,7 @@ async def accrue_referral_bonus(referred_user_id: int, game_winning_amount: Deci
 
     # Высчитываем сумму бонуса
     multiplier = await calculate_referral_bonus_percent(user_id=referrer_id)
-    referral_bonus = game_winning_amount * multiplier
+    referral_bonus = game_winning_amount * Decimal(multiplier)
 
     # Начисляем бонус тому, кто пригласил юзера
     referrer.balance += referral_bonus

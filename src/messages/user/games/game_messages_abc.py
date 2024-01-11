@@ -21,6 +21,11 @@ class CreatableGamesMessages(ABC):
 
     @staticmethod
     @abstractmethod
+    def get_ask_for_bet_photo() -> str:
+        pass
+
+    @staticmethod
+    @abstractmethod
     def get_game_created(game_number: int):
         return f'✅ Игра №{game_number} создана. \n\n⏰ Скоро кто-то присоединится...'
 
