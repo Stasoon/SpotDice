@@ -1,46 +1,49 @@
+from typing import Literal
+
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardBuilder
 
-from src.database import get_top_winners_by_count
+from src.database import User
 from src.misc import MenuNavigationCallback
 
 
-async def get_top_markup(stars: list, days: int = None):
-    """Возвращает клавиатуру с топом игроков за конкретный период. \n
-    ! stars - костыль, список из трёх строк ['', '', '⭐'],
-    где одна - звёздочка, которая подставляется в выбранную кнопку"""
-    top_players = await get_top_winners_by_count(days_back=days)
-    builder = InlineKeyboardBuilder()
-    for user in top_players:
-        builder.button(
-            text=f"👤 {user.name}  |  🏆 {user.wins_count}",
-            url=f"tg://user?id={user.telegram_id}"
-        )
-    builder.adjust(1)
-
+def __get_nav_builder(selected_period: Literal['all', 'day', 'month']) -> InlineKeyboardBuilder:
     nav_builder = InlineKeyboardBuilder()
-    nav_builder.button(text=f'{stars[0]}За всё время',
-                       callback_data=MenuNavigationCallback(branch='top_players', option='all'))
-    nav_builder.button(text=f'{stars[1]}За месяц',
-                       callback_data=MenuNavigationCallback(branch='top_players', option='month'))
-    nav_builder.button(text=f'{stars[2]}За сутки', callback_data=MenuNavigationCallback(branch='top_players', option='day'))
+
+    match selected_period:
+        case 'all': stars = ['⭐', '', '']
+        case 'month': stars = ['', '⭐', '']
+        case _: stars = ['', '', '⭐']
+
+    nav_builder.button(
+        text=f'{stars[0]}За всё время', callback_data=MenuNavigationCallback(branch='top_players', option='all'))
+    nav_builder.button(
+        text=f'{stars[1]}За месяц', callback_data=MenuNavigationCallback(branch='top_players', option='month'))
+    nav_builder.button(
+        text=f'{stars[2]}За сутки', callback_data=MenuNavigationCallback(branch='top_players', option='day'))
     nav_builder.adjust(3)
 
-    builder.attach(nav_builder)
-    return builder.as_markup()
+    return nav_builder
 
 
-class UserTopPlayersKeyboards:
-    @staticmethod
-    async def get_day_top_players() -> InlineKeyboardMarkup:
-        """Возвращает клавиатуру, отображающую топ игроков с количеством их побед за день"""
-        return await get_top_markup(days=1, stars=['', '', '⭐'])
+def get_top_players_markup(
+        top_players: list[tuple[str, int | None, int]], selected_period: Literal['all', 'day', 'month']
+) -> InlineKeyboardMarkup:
+    """
+    Возвращает клавиатуру, отображающую топ игроков с количеством их побед.
+    :param top_players: Список кортежей (имя, telegram id, количество побед).
+    :param selected_period: За какой период отобразить.
+    """
+    builder = InlineKeyboardBuilder()
 
-    @staticmethod
-    async def get_month_top_players() -> InlineKeyboardMarkup:
-        """Возвращает клавиатуру, отображающую топ игроков с количеством их побед за месяц"""
-        return await get_top_markup(days=31, stars=['', '⭐', ''])
+    for user_data in top_players:
+        name, telegram_id, wins_count = user_data
+        text = f"👤 {name}  |  🏆 {wins_count}"
 
-    @staticmethod
-    async def get_all_time_top_players() -> InlineKeyboardMarkup:
-        """Возвращает клавиатуру, отображающую топ игроков с количеством их побед за всё время"""
-        return await get_top_markup(stars=['⭐', '', ''])
+        if telegram_id:
+            builder.button(text=text, url=f"tg://user?id={telegram_id}")
+        else:
+            builder.button(text=text, callback_data='*')
+
+    builder.adjust(1)
+    nav_builder = __get_nav_builder(selected_period=selected_period)
+    return builder.attach(nav_builder).as_markup()

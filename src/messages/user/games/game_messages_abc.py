@@ -17,7 +17,7 @@ class CreatableGamesMessages(ABC):
     @staticmethod
     @abstractmethod
     def ask_for_bet_amount(player_name: str) -> str:
-        pass
+        return 'Сколько будешь ставить?'
 
     @staticmethod
     @abstractmethod
@@ -39,14 +39,14 @@ class BotGamesMessagesBase(ABC):
     @staticmethod
     @abstractmethod
     def get_tie() -> str:
-        pass
+        return 'Ничья!'
 
     @staticmethod
     @abstractmethod
     def get_player_won(player_name: str = 'Игрок', win_amount: float = 0) -> str:
-        pass
+        return 'Ты выиграл!'
 
     @staticmethod
     @abstractmethod
     def get_player_loose() -> str:
-        pass
+        return 'Ты проиграл!'

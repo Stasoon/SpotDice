@@ -1,5 +1,6 @@
 from typing import Type, Union
 
+from src.messages.user.games.slots import SlotsMessages
 from src.misc import GameType, GameCategory
 from src.messages.user.games import BlackJackMessages, BaccaratMessages, BasketballMessages
 from src.messages.user.games.bowling import BowlingMessages
@@ -36,3 +37,5 @@ def get_message_instance_by_game_type(game_type: GameType) -> Type[Union[Creatab
             return DartsMessages
         case GameType.DICE:
             return DiceMessages
+        case GameType.CASINO:
+            return SlotsMessages

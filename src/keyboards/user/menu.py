@@ -28,7 +28,8 @@ class UserMenuKeyboards:
         builder = InlineKeyboardBuilder()
         builder.button(
             text='📃 Соглашение',
-            web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'),
+            # url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'
+            web_app=WebAppInfo(url='https://teletype.in/@spotdice/WEIwyj5vu3i'),
         )
         #builder.button(text='Канал', url=url)
         #builder.button(text='Игровой чат', url=url)
