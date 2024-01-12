@@ -11,42 +11,37 @@ from src.misc import MenuNavigationCallback
 invite_link = 'tg://msg_url?url=https://t.me/{bot_username}?start=ref{user_tg_id}' \
               '&text=Присоединяйся%20по%20моей%20ссылке'
 
+agreement_url = 'https://teletype.in/@spotdice/WEIwyj5vu3i'
+
 
 class UserMenuKeyboards:
 
     @staticmethod
     def get_user_agreement() -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        builder.button(
-            text='📃 Соглашение',
-            web_app=WebAppInfo(url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4')
-        )
+        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url=agreement_url))
         return builder.as_markup()
 
     @staticmethod
     def get_user_agreement_with_need_sub(url: str) -> InlineKeyboardMarkup:
         builder = InlineKeyboardBuilder()
-        builder.button(
-            text='📃 Соглашение',
-            # url='https://telegra.ph/Polzovatelskoe-soglashenie-01-05-4'
-            web_app=WebAppInfo(url='https://teletype.in/@spotdice/WEIwyj5vu3i'),
-        )
-        #builder.button(text='Канал', url=url)
-        #builder.button(text='Игровой чат', url=url)
-        #builder.button(text='✅ Проверить', callback_data='check_subscribe')
+        builder.button(text='📃 Соглашение', web_app=WebAppInfo(url=agreement_url),)
+        builder.button(text='Канал', url=url)
+        builder.button(text='✅ Проверить', callback_data='check_subscribe')
         builder.adjust(1)
         return builder.as_markup()
 
     # branch MAIN
     @staticmethod
     def get_main_menu() -> ReplyKeyboardMarkup:
-        menu_kb = ReplyKeyboardMarkup(keyboard=[
-            [KeyboardButton(text="🎰  Играть  🎰")],
-            [KeyboardButton(text="🎩 Профиль"), KeyboardButton(text="🏆 Топ игроков")],
-            [KeyboardButton(text="📰 События"), KeyboardButton(text="ℹ Информация")],
-            [KeyboardButton(text="🕸️ Банды")]
+        menu_kb = ReplyKeyboardMarkup(
+            keyboard=[
+                [KeyboardButton(text="🎰  Играть  🎰")],
+                [KeyboardButton(text="🎩 Профиль"), KeyboardButton(text="🕸️ Банды")],
+                [KeyboardButton(text="🏆 Топ игроков"), KeyboardButton(text="ℹ Информация")],
             ],
-            resize_keyboard=True, input_field_placeholder=None)
+            resize_keyboard=True, input_field_placeholder=None
+        )
         return menu_kb
 
     # Events

@@ -290,10 +290,9 @@ async def handle_band_opponents(callback: CallbackQuery, callback_data: BandCall
 
     for band in await bands.get_band_opponents(player_band=user_band):
         creator_chat = await bot.get_chat(chat_id=band.creator.telegram_id)
-        if creator_chat.has_private_forwards:
-            link = band.creator.get_mention_url()
-        else:
-            link = None
+        if creator_chat.has_private_forwards: link = None
+        else: link = band.creator.get_mention_url()
+
         opponents.append((band, link))
 
     await callback.message.edit_text(
@@ -309,8 +308,8 @@ async def handle_rating_callback(callback: CallbackQuery):
     for band in bands_rating:
         creator_chat = await bot.get_chat(chat_id=band.creator.telegram_id)
 
-        if creator_chat.has_private_forwards: link = band.creator.get_mention_url()
-        else: link = None
+        if creator_chat.has_private_forwards: link = None
+        else: link = band.creator.get_mention_url()
         bands_links.append((band, link))
 
     user_band = await bands.get_user_band(telegram_id=callback.from_user.id)

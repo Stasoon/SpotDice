@@ -88,8 +88,8 @@ class UserMenuMessages:
     async def get_profile(user: User) -> str:
         user_band = await bands.get_user_band(telegram_id=user.telegram_id)
 
-        band_text = '— \n' if not user_band else f'<code>{user_band.title}</code> \n'
-        band_text = f"🕸 Банда: {html.quote(band_text)}"
+        band_text = '— \n' if not user_band else f'<code>{html.quote(user_band.title)}</code> \n'
+        band_text = f"🕸 Банда: {band_text}"
         rank_text = f"⚔ Твоя лига: {BandLeague.CROOKS if not user_band else user_band.league} \n"
 
         return (

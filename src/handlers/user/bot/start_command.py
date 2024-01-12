@@ -1,3 +1,5 @@
+import asyncio
+
 from aiogram import F, Router
 from aiogram.enums import ChatMemberStatus
 from aiogram.filters import CommandStart
@@ -13,7 +15,7 @@ from src.messages import get_full_game_info_text, GameErrors
 from src.messages.user import UserMenuMessages
 from src.database import users, games, referral_links
 from src.misc import GameStatus
-from src.misc.states import CheckSubscribeStates
+# from src.misc.states import CheckSubscribeStates
 
 
 # region Utils
@@ -23,20 +25,30 @@ channel_id = -1001947654963
 channel_url = 'https://t.me/barrednews'
 
 
-async def send_user_agreement(to_message: Message):
+# async def send_user_agreement(to_message: Message):
     # markup = UserMenuKeyboards.get_user_agreement_with_need_sub(url=channel_url)
     # text = UserMenuMessages.get_need_sub()
 
-    await to_message.answer_animation(
-        animation=UserMenuMessages.get_user_agreement_animation(),
-        caption=UserMenuMessages.get_welcome(),
-        reply_markup=UserMenuKeyboards.get_user_agreement_with_need_sub(url='https://t.me/SpotDice')
-    )
     #await to_message.answer_animation(
     #    animation=UserMenuMessages.get_user_agreement_animation(),
     #    caption=text,
     #    reply_markup=markup
     #)
+
+
+async def send_welcome(to_message: Message):
+    await to_message.answer_sticker(
+        sticker=UserMenuMessages.get_welcome_sticker(),
+        reply_markup=UserMenuKeyboards.get_main_menu()
+    )
+
+    await asyncio.sleep(0.8)
+
+    await to_message.answer_animation(
+        animation=UserMenuMessages.get_user_agreement_animation(),
+        caption=UserMenuMessages.get_welcome(),
+        reply_markup=UserMenuKeyboards.get_user_agreement()
+    )
 
 
 async def create_user(telegram_user):
@@ -68,16 +80,14 @@ async def handle_start_cmd_with_user_referral_link(message: Message, command: Co
     if created_user:
         await process_referral_code_arg(command_args, message.from_user.id)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
-    await send_user_agreement(to_message=message)
+    await send_welcome(to_message=message)
 
 
 async def handle_empty_start_cmd(message: Message):
     # создаём пользователя, если не существует
     await create_user(message.from_user)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
-    await send_user_agreement(to_message=message)
+    await send_welcome(to_message=message)
 
 
 async def handle_promotion_link_start_cmd(message: Message, command: CommandObject):
@@ -86,8 +96,7 @@ async def handle_promotion_link_start_cmd(message: Message, command: CommandObje
     if created_user:
         await referral_links.increase_users_count(name=command.args)
 
-    await message.answer_sticker(sticker=UserMenuMessages.get_welcome_sticker(), reply_markup=UserMenuKeyboards.get_main_menu())
-    await send_user_agreement(to_message=message)
+    await send_welcome(to_message=message)
 
 
 async def handle_start_to_show_game_cmd(message: Message, command: CommandObject):
@@ -118,28 +127,28 @@ async def handle_join_band(message: Message, command: CommandObject):
     await show_band_to_join(bot=message.bot, user_id=message.from_user.id, band_id=band_id)
 
 
-async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMContext):
-    try:
-        member = await callback.bot.get_chat_member(chat_id=channel_id, user_id=callback.from_user.id)
-    except Exception:
-        await callback.message.delete()
-        await callback.message.answer_animation(
-            animation=UserMenuMessages.get_user_agreement_animation(),
-            caption=UserMenuMessages.get_welcome(),
-            reply_markup=UserMenuKeyboards.get_main_menu()
-        )
-        return
-
-    if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR]:
-        await callback.answer('Вы не подписались!')
-    else:
-        await callback.message.delete()
-        await callback.message.answer_animation(
-            animation=UserMenuMessages.get_user_agreement_animation(),
-            caption=UserMenuMessages.get_welcome(),
-            reply_markup=UserMenuKeyboards.get_main_menu()
-        )
-        await state.clear()
+# async def handle_check_subscribed_callback(callback: CallbackQuery, state: FSMContext):
+#     try:
+#         member = await callback.bot.get_chat_member(chat_id=channel_id, user_id=callback.from_user.id)
+#     except Exception:
+#         await callback.message.delete()
+#         await callback.message.answer_animation(
+#             animation=UserMenuMessages.get_user_agreement_animation(),
+#             caption=UserMenuMessages.get_welcome(),
+#             reply_markup=UserMenuKeyboards.get_main_menu()
+#         )
+#         return
+#
+#     if not member or member.status not in [ChatMemberStatus.MEMBER, ChatMemberStatus.ADMINISTRATOR, ChatMemberStatus.CREATOR]:
+#         await callback.answer('Вы не подписались!')
+#     else:
+#         await callback.message.delete()
+#         await callback.message.answer_animation(
+#             animation=UserMenuMessages.get_user_agreement_animation(),
+#             caption=UserMenuMessages.get_welcome(),
+#             reply_markup=UserMenuKeyboards.get_main_menu()
+#         )
+#         await state.clear()
 
 
 # endregion
