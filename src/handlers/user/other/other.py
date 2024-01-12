@@ -22,9 +22,15 @@ async def handle_not_registered_in_bot_callbacks(callback: CallbackQuery):
     await callback.answer(text=GameErrors.get_not_registered_in_bot(), show_alert=True)
 
 
+# Пустые каллбэки
+async def handle_empty_callbacks(callback: CallbackQuery):
+    await callback.answer()
+
+
 def register_other_handlers(router: Router):
     router.my_chat_member.filter(F.chat.type == "private")
     router.my_chat_member.register(handle_bot_blocked, ChatMemberUpdatedFilter(member_status_changed=KICKED))
 
     router.message.register(handle_not_registered_in_bot_messages, MessageIsCommand(), UserExistFilter(False))
     router.callback_query.register(handle_not_registered_in_bot_callbacks, UserExistFilter(False))
+    router.callback_query.register(handle_empty_callbacks, F.data == '*')

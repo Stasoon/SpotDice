@@ -67,8 +67,8 @@ async def get_player_ids_of_game(game: Game) -> List[int]:
 
 async def is_game_full(game: Game) -> bool:
     """Возвращает True, если все игроки собраны"""
-    players = await get_players_of_game(game)
-    return True if len(players) >= game.max_players else False
+    players_count = await game.players.all().count()
+    return True if players_count >= game.max_players else False
 
 
 async def get_chat_available_games(chat_id: int) -> Union[List[Game], None]:
@@ -136,11 +136,15 @@ async def get_total_games_count() -> int:
 
 # Update
 
-async def add_user_to_game(telegram_id: int, game_number: int) -> None:
+async def add_user_to_game(telegram_id: int, game_number: int) -> bool:
     user = await User.get(telegram_id=telegram_id)
     game = await Game.get(number=game_number)
 
-    await game.players.add(user)
+    if await game.players.all().count() < game.max_players:
+        await game.players.add(user)
+        return True
+    else:
+        return False
 
 
 async def update_message_id(game: Game, new_message_id: int):

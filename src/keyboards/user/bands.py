@@ -86,27 +86,45 @@ class BandsKeyboards:
         return builder.as_markup()
 
     @staticmethod
-    def get_band_competitors(user_band: Band, bands: list[Band]) -> InlineKeyboardMarkup:
+    def get_band_competitors(user_band: Band, bands: list[tuple[Band, str | None]]) -> InlineKeyboardMarkup:
+        """
+        :param user_band: банда, которую нужно выделить
+        :param bands: список из кортежей (банда, ссылка для кнопки)
+        """
         builder = InlineKeyboardBuilder()
 
-        for band in bands:
+        for band, link in bands:
             star_text = "✴ " if band == user_band else ""
-            builder.button(
-                text=f"{star_text}{band.title} - 💰 {float(band.score)}",
-                url=str(band.creator.get_mention_url())
-            )
+            text = f"{star_text}{band.title} - 💰 {float(band.score)}"
+
+            if link: builder.button(text=text, url=link)
+            else: builder.button(text=text, callback_data='*')
+
         builder.button(text="🔙 Назад", callback_data=BandCallback(band_id=user_band.id))
 
         builder.adjust(1)
         return builder.as_markup()
 
     @staticmethod
-    def get_global_rating(bands: list[Band], user_band: Band = None, user_band_ranking: int = None) -> InlineKeyboardMarkup:
+    def get_global_rating(
+            bands: list[tuple[Band, str | None]],
+            user_band: Band = None,
+            user_band_ranking: int = None
+    ) -> InlineKeyboardMarkup:
+        """
+        :param bands: список из кортежей (банда, ссылка для кнопки)
+        :param user_band: банда, которую нужно выделить
+        :param user_band_ranking: место банды юзера в рейтинге
+        """
+
         builder = InlineKeyboardBuilder()
 
-        for n, band in enumerate(bands, start=1):
-            creator_link = band.creator.get_mention_url()
-            builder.button(text=f"{get_emoji_number(n)} {band.title} - {band.league}", url=creator_link)
+        for n, band_data in enumerate(bands, start=1):
+            band, link = band_data
+            text = f"{get_emoji_number(n)} {band.title} - {band.league}"
+
+            if link: builder.button(text=text, url=link)
+            else: builder.button(text=text, callback_data='*')
 
         if user_band and user_band_ranking and len(bands) < user_band_ranking:
             builder.button(text='...', callback_data='*')

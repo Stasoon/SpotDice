@@ -132,7 +132,7 @@ async def validate_join_game_request(callback: CallbackQuery, game: Game) -> boo
     user_active_game = await games.get_user_unfinished_game(user_id)
 
     # если игра уже закончена
-    if game.status in (GameStatus.CANCELLED, GameStatus.FINISHED):
+    if game.status in (GameStatus.CANCELLED, GameStatus.FINISHED, GameStatus.ACTIVE, GameStatus.WAIT_FOR_CONFIRM):
         await callback.answer(text=GameErrors.get_game_is_full())
         return False
     # если баланс меньше ставки
@@ -148,8 +148,9 @@ async def validate_join_game_request(callback: CallbackQuery, game: Game) -> boo
         await callback.answer(text=GameErrors.get_already_in_other_game(user_active_game), show_alert=True)
         return False
     # если игра уже заполнена
-    elif await games.is_game_full(game) or game.status == GameStatus.ACTIVE:
+    elif await games.is_game_full(game):
         await callback.answer(text=GameErrors.get_game_is_full(), show_alert=True)
         return False
-    await callback.answer('✅ Вы присоединились к игре')
-    return True
+    else:
+        await callback.answer('✅ Вы присоединились к игре')
+        return True

@@ -285,7 +285,16 @@ async def handle_consider_delete_band(callback: CallbackQuery, callback_data: Ba
 
 async def handle_band_opponents(callback: CallbackQuery, callback_data: BandCallback):
     user_band = await bands.get_band_by_id(band_id=callback_data.band_id)
-    opponents = await bands.get_band_opponents(player_band=user_band)
+
+    opponents = []
+
+    for band in await bands.get_band_opponents(player_band=user_band):
+        creator_chat = await bot.get_chat(chat_id=band.creator.telegram_id)
+        if creator_chat.has_private_forwards:
+            link = band.creator.get_mention_url()
+        else:
+            link = None
+        opponents.append((band, link))
 
     await callback.message.edit_text(
         text='Соперники вашей банды:',
@@ -296,10 +305,17 @@ async def handle_band_opponents(callback: CallbackQuery, callback_data: BandCall
 # РЕЙТИНГ БАНД
 async def handle_rating_callback(callback: CallbackQuery):
     bands_rating = await bands.get_bands_global_rating(count=10)
+    bands_links = []
+    for band in bands_rating:
+        creator_chat = await bot.get_chat(chat_id=band.creator.telegram_id)
+
+        if creator_chat.has_private_forwards: link = band.creator.get_mention_url()
+        else: link = None
+        bands_links.append((band, link))
 
     user_band = await bands.get_user_band(telegram_id=callback.from_user.id)
     user_band_rank = await bands.get_band_rating_position(target_band=user_band)
-    markup = BandsKeyboards.get_global_rating(bands_rating, user_band, user_band_rank)
+    markup = BandsKeyboards.get_global_rating(bands_links, user_band, user_band_rank)
 
     await callback.message.edit_caption(caption='📊 Рейтинг банд', reply_markup=markup)
 

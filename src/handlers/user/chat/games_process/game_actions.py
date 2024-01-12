@@ -36,10 +36,14 @@ async def start_chat_game(game: Game, callback: CallbackQuery):
 
 async def join_chat_game(callback: CallbackQuery, game: Game):
     """Добавляет юзера в игру. Если все игроки собраны, запускает игру"""
+    players = await games.get_players_of_game(game)
+    if len(players) > game.max_players:
+        return
+
     await games.add_user_to_game(telegram_id=callback.from_user.id, game_number=game.number)
     await transactions.deduct_bet_from_user_balance(game=game, user_telegram_id=callback.from_user.id, amount=game.bet)
 
-    if len(await games.get_players_of_game(game)) >= game.max_players:
+    if len(players)+1 == game.max_players:
         await start_chat_game(game, callback)
     else:
         text = await UserPublicGameMessages.get_game_in_chat_created(game=game, chat_username=callback.message.chat.username)
