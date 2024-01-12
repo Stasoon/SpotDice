@@ -9,16 +9,16 @@ from ..users import get_referrer_id_of_user, get_user_or_none, get_referrals_cou
 async def calculate_referral_bonus_percent(user_id: int) -> float:
     referrals_count = await get_referrals_count_by_telegram_id(user_id=user_id)
 
-    if referrals_count < 5:
-        multiplier = 0.5
-    elif 5 <= referrals_count < 15:
-        multiplier = 0.6
-    elif 15 <= referrals_count < 50:
-        multiplier = 0.7
-    elif 50 <= referrals_count < 500:
-        multiplier = 0.8
-    else:
-        multiplier = 1
+    if referrals_count < 50:
+        multiplier = 2
+    elif 50 <= referrals_count < 100:
+        multiplier = 2.5
+    elif 100 <= referrals_count < 170:
+        multiplier = 3
+    elif 170 <= referrals_count < 300:
+        multiplier = 4
+    else:  # referrals_count >= 300
+        multiplier = 5
 
     return multiplier/100
 

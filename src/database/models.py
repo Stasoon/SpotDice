@@ -28,7 +28,7 @@ class User(Model):
     def __str__(self):
         """Возвращает текст со ссылкой-упоминанием юзера в html"""
         link = self.get_mention_url()
-        mention = f'{html.link(self.name, link=link)}'
+        mention = f'{html.link(html.quote(self.name), link=link)}'
         return mention
 
     class Meta:

@@ -1,17 +1,11 @@
-import html
 from decimal import Decimal
+
+from aiogram import html
 
 from settings import Config
 from src.database.models import Band, User
 from src.misc.enums.leagues import BandLeague
 from src.utils.text_utils import format_float_to_rub_string, get_emoji_number
-
-
-def get_member_link(member: User):
-    if member.telegram_id:
-        return f"<a href='tg://user?id={member.telegram_id}'>{html.escape(member.name)}</a>"
-    else:
-        return html.escape(member.name)
 
 
 class BandsMessages:
@@ -45,7 +39,7 @@ class BandsMessages:
         list_len = 6
         band_names = band_names[:list_len] + ['Мистер Н']*(list_len-len(band_names))
         enumerated_band_names = [
-            f"{get_emoji_number(n)} {band_name}"
+            f"{get_emoji_number(n)} {html.quote(band_name)}"
             for n, band_name in enumerate(band_names, start=1)
         ]
         band_names_text = "\n".join(enumerated_band_names)
@@ -61,7 +55,7 @@ class BandsMessages:
         )
 
         return (
-            f'<b>Банда "{band.title}"</b> \n\n'
+            f'<b>Банда "{html.quote(band.title)}"</b> \n\n'
             f'👑 Главарь: {band_creator} \n'
             f'📈 Ранг: {band.league} \n'
             f'💰 Общак: {format_float_to_rub_string(band.score)} \n\n'

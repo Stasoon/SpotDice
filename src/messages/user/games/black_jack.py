@@ -1,5 +1,7 @@
 import random
 
+from aiogram import html
+
 from src.utils.text_utils import format_float_to_rub_string
 from .game_messages_abc import GameCategoryMessages, BotGamesMessagesBase, CreatableGamesMessages
 
@@ -22,7 +24,7 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages, GameCatego
             'Азарт, победы, страсть! \nВсе эти слова сразу же заполоняют твою голову, когда видишь эти игровые столы и выкрики других игроков из главного зала. \nИ ты точно хочешь составить им компанию.',
             '"А что если прямо сейчас поставить всё и выйти победителем?" — именно с этими мыслями ты заходишь в просторный зал казино.',
         )
-        return f"♠ BlackJack \n\n{random.choice(texts).format(player_name=player_name)}"
+        return f"♠ BlackJack \n\n{random.choice(texts).format(player_name=html.quote(player_name))}"
 
     @staticmethod
     def get_game_created(game_number: int):
@@ -40,7 +42,7 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages, GameCatego
             'DICY: Чуешь звон монет, {player_name}? \nСкорее ставь и ощути вкус победы.',
             'DICY: {player_name}, смотри, расклад такой: \nНе теряешь голову и спокойно ставишь лесенкой. \nХладнокровно и четко — слова, которые должны тебя описывать.'
         )
-        return random.choice(texts).format(player_name=player_name)
+        return random.choice(texts).format(player_name=html.quote(player_name))
 
     @staticmethod
     def get_game_started(player_name: str = 'дружище') -> str:
@@ -52,7 +54,7 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages, GameCatego
             'Игра началась, {player_name}! \nНе подведи меня, я поспорил на твою победу!',
             'А вот и началась игра, {player_name}! \nОжидай своего хода. ',
         )
-        return random.choice(texts).format(player_name=player_name)
+        return random.choice(texts).format(player_name=html.quote(player_name))
 
     @staticmethod
     def get_player_took_card(player_points: int) -> str:
@@ -100,7 +102,9 @@ class BlackJackMessages(BotGamesMessagesBase, CreatableGamesMessages, GameCatego
             'DICY: Это было несложно, да, {player_name}? Держи свой выигрыш: {win_amount} \n\nКак насчет снова почувствовать себя победителем и сыграть еще?',
             'DICY: "Ты никогда не почувствуешь вкус победы, если карты для тебя не больше, чем развлечение" — помни это и бери свои фишки на сумму {win_amount}',
         )
-        return random.choice(texts).format(player_name=player_name, win_amount=format_float_to_rub_string(win_amount))
+        return random.choice(texts).format(
+            player_name=html.quote(player_name), win_amount=format_float_to_rub_string(win_amount)
+        )
 
     @staticmethod
     def get_tie():
