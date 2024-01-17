@@ -36,6 +36,10 @@ class FootballMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return random.choice(texts)
 
     @staticmethod
+    def get_ask_for_bet_photo() -> str:
+        return 'https://telegra.ph/file/b0522240c77257b649f67.png'
+
+    @staticmethod
     def get_game_started():
         texts = (
             '"Вдох, выдох, разбег и удар. Всё просто" — крутится у тебя в голове.',

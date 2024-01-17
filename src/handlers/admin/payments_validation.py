@@ -20,7 +20,7 @@ async def handle_validate_payment_callback(callback: CallbackQuery, callback_dat
 
     transaction_word = 'пополнение' if callback_data.transaction_type == 'deposit' else 'вывод'
 
-    if callback_data.confirm is False:
+    if callback_data.confirm is False:  # Если отмена
         await callback.bot.send_message(
             callback_data.user_id,
             text=f'❌ Ваша заявка на {transaction_word} {callback_data.amount}₽ была отклонена. \n\n'
@@ -32,15 +32,17 @@ async def handle_validate_payment_callback(callback: CallbackQuery, callback_dat
             await deposit_to_user(user_id=callback_data.user_id, amount=callback_data.amount, create_record=False)
             return
         return
-    else:
+    else:  # Если подтвердили
         await callback.bot.send_message(
             callback_data.user_id,
             text=f'✅ Ваша заявка на {transaction_word} {callback_data.amount}₽ была выполнена.'
         )
 
         if callback_data.transaction_type == 'deposit':
-            await deposit_to_user(user_id=callback_data.user_id, amount=callback_data.amount, create_record=False)
-
+            await deposit_to_user(
+                user_id=callback_data.user_id, amount=callback_data.amount,
+                method=callback_data.method, create_record=True
+            )
 
 
 def register_validate_request_handlers(router: Router):

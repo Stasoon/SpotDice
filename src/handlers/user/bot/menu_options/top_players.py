@@ -10,7 +10,7 @@ from src.messages import UserMenuMessages
 from src.misc import MenuNavigationCallback
 
 
-async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = 1):
+async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
     top_players = await get_top_winners_by_count(days_back=days_back, limit=10)
     data = []
 
@@ -30,12 +30,11 @@ async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = 1):
 
 
 async def handle_top_player_button(message: Message):
-    top_users = await get_top_players_without_privacy_mode(message.bot)
+    top_users = await get_top_players_without_privacy_mode(bot=message.bot)
 
     await message.answer(
         text=UserMenuMessages.get_top_players(),
         reply_markup=get_top_players_markup(top_players=top_users, selected_period='all'),
-        parse_mode='HTML'
     )
 
 

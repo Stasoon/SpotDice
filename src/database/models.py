@@ -14,8 +14,8 @@ from src.misc.enums.leagues import BandLeague
 
 class User(Model):
     telegram_id = fields.BigIntField(pk=True)
-    name = fields.CharField(max_length=32)
-    username = fields.CharField(max_length=32, null=True)
+    name = fields.CharField(max_length=150)
+    username = fields.CharField(max_length=50, null=True)
     balance = fields.DecimalField(max_digits=12, decimal_places=2)
     referred_by = fields.ForeignKeyField('models.User', related_name='referrals', null=True)
     registration_date = fields.DatetimeField(auto_now_add=True)

@@ -2,7 +2,6 @@ from typing import Literal
 
 from aiogram.utils.keyboard import InlineKeyboardMarkup, InlineKeyboardBuilder
 
-from src.database import User
 from src.misc import MenuNavigationCallback
 
 

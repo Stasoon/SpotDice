@@ -19,6 +19,10 @@ class BowlingMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return random.choice(texts)
 
     @staticmethod
+    def get_ask_for_bet_photo() -> str:
+        return 'https://telegra.ph/file/636d71c96544b2c9741ed.png'
+
+    @staticmethod
     def get_game_created(game_number: int):
         return CreatableGamesMessages.get_game_created(game_number=game_number)
 

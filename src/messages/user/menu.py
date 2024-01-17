@@ -42,9 +42,9 @@ class UserMenuMessages:
     def get_play_menu_photo() -> str:
         return 'https://telegra.ph/file/b2d6791839dffc50bae8b.png'
 
-    @staticmethod
-    def get_events() -> str:
-        return '📰 Наши события'
+    # @staticmethod
+    # def get_events() -> str:
+    #     return '📰 Наши события'
 
     @staticmethod
     async def get_referral_system(bot_username: str, user_id: int) -> str:

@@ -10,7 +10,7 @@ from src.utils.game_validations import validate_create_game_cmd
 
 
 async def create_game_and_send(message: Message, command: CommandObject, game_type: GameType, users_count: int):
-    bet = float(command.args.split()[0])
+    bet = float(command.args.replace(',', '.').split()[0])
 
     game = await games.create_game(
         creator_telegram_id=message.from_user.id,
