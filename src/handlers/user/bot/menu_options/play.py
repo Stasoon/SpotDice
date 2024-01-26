@@ -71,8 +71,8 @@ async def show_basic_game_types(to_message: Message):
 
 
 async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_category: GameCategory):
+    await callback.message.edit_reply_markup(reply_markup=None)
     message = callback.message
-    await message.delete()
 
     message_instance = get_message_instance_by_game_type(game_type=game_type)
     text = await UserPrivateGameMessages.enter_bet_amount(
@@ -83,6 +83,8 @@ async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_c
 
     if photo: await message.answer_photo(photo=photo, caption=text, reply_markup=markup)
     else: await message.answer(text=text, reply_markup=markup)
+
+    await message.delete()
 
 
 # endregion

@@ -217,15 +217,15 @@ class BlackJackStrategy(GameStrategy):
         # Если у всех ничья
         elif len(result.winnings) == 0 and len(result.ties) == 2:  # кол-во ничьих = кол-ву игроков
             text = BlackJackMessages.get_global_tie()
-        # Если нет в победителях (победил другой игрок)
-        elif player_id not in result.winnings:
-            text = BlackJackMessages.get_player_loose()
         # Если игрок среди тех, у кого ничья
         elif player_id in result.ties:
             text = BlackJackMessages.get_tie()
         # Если won_players пуст, то устанавливаем текст о победе дилера
         elif len(result.winnings) == 0:
             text = BlackJackMessages.get_dealer_won()
+        # Если нет в победителях (победил другой игрок)
+        elif player_id not in result.winnings:
+            text = BlackJackMessages.get_player_loose()
 
         return text
 

@@ -59,10 +59,9 @@ async def handle_withdraw_callback(callback: CallbackQuery):
         await callback.answer(text=BalanceErrors.low_balance_for_withdraw(min_withdraw_amount), show_alert=True)
         return
 
-    await callback.message.edit_text(
-        text=UserPaymentMessages.get_choose_withdraw_method(),
-        reply_markup=UserPaymentKeyboards.get_withdraw_methods(),
-        parse_mode='HTML'
+    await callback.message.edit_caption(
+        caption=UserPaymentMessages.get_choose_withdraw_method(),
+        reply_markup=UserPaymentKeyboards.get_withdraw_methods()
     )
 
 
@@ -76,7 +75,6 @@ async def handle_withdraw_command(message: Message):
     await message.answer(
         text=UserPaymentMessages.get_choose_withdraw_method(),
         reply_markup=UserPaymentKeyboards.get_withdraw_methods(),
-        parse_mode='HTML'
     )
 
 

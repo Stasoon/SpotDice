@@ -75,13 +75,17 @@ class EvenUneven:
         # Удаляем сообщение с таймером
         await self.bot.delete_message(chat_id=chat_id, message_id=msg_id)
 
-    async def __accrue_winnings_and_notify_players(self, won_bet_options):
+    async def __accrue_winnings_and_notify_players(self, won_bet_options, dice_messages: tuple[Message, Message]):
         player_bets = await even_uneven.get_players_bets()
         winnings_sum = 0
 
         for bet in player_bets:
             player_id = (await bet.player.get()).telegram_id
             await even_uneven.delete_player_bet(player_id=player_id)
+
+            for msg in dice_messages:
+                await msg.forward(chat_id=player_id)
+                await asyncio.sleep(0.05)
 
             if bet.option in won_bet_options:
                 win_amount = await transactions.accrue_winnings(
@@ -91,7 +95,7 @@ class EvenUneven:
                 winnings_sum += win_amount
                 text = EvenUnevenMessages.get_player_won(bet_option=bet.option, amount=win_amount)
             else:
-                text = EvenUnevenMessages.get_player_loose(bet=bet.option)
+                text = EvenUnevenMessages.get_player_loose(bet_option=bet.option)
             await self.bot.send_message(chat_id=player_id, text=text, parse_mode='HTML')
 
         return winnings_sum
@@ -129,7 +133,7 @@ class EvenUneven:
             seconds=seconds_to_wait
         )
 
-    async def __send_dices_and_get_values(self) -> list[int, int]:
+    async def __send_dices_and_get_messages(self) -> tuple[Message, Message]:
         self.__round_message_ids.append(
             (await self.bot.send_message(chat_id=self.chat_id, text='🎲 Бросаем кубики')).message_id
         )
@@ -137,23 +141,23 @@ class EvenUneven:
         values = []
         for _ in range(2):
             dice_msg = await self.bot.send_dice(chat_id=self.chat_id, emoji=DiceEmoji.DICE)
-            values.append(dice_msg.dice.value)
+            values.append(dice_msg)
             self.__round_message_ids.append(dice_msg.message_id)
 
         self.__round_message_ids.append(
             (await self.bot.send_message(chat_id=self.chat_id, text='Выигрыши начислены')).message_id
         )
-        return values
+        return tuple(values)
 
     async def process_round(self):
         # Создаём раунд
         await self.__send_round_start_and_start_timer(self.round_number)
 
         # Бросаем кости и получаем победившие ставки
-        results = await self.__send_dices_and_get_values()
-        won_bet_options = get_won_bet_options(results)
+        dice_messages = await self.__send_dices_and_get_messages()
+        won_bet_options = get_won_bet_options(dice_values=[msg.dice.value for msg in dice_messages])
 
-        await self.__accrue_winnings_and_notify_players(won_bet_options=won_bet_options)
+        await self.__accrue_winnings_and_notify_players(won_bet_options=won_bet_options, dice_messages=dice_messages)
 
     async def clear_round_messages(self):
         # Удаляем сообщения, присланные за раунд
@@ -193,7 +197,7 @@ async def start_even_uneven_loop(bot: Bot, channel_id: int):
             logger.error(e)
 
         # Ждём, чтобы игроки увидели результаты
-        seconds_btw_rounds = 10
+        seconds_btw_rounds = 50
         await asyncio.sleep(seconds_btw_rounds)
 
         data['round_number'] += 1

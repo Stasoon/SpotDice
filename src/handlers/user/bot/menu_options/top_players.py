@@ -32,8 +32,9 @@ async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
 async def handle_top_player_button(message: Message):
     top_users = await get_top_players_without_privacy_mode(bot=message.bot)
 
-    await message.answer(
-        text=UserMenuMessages.get_top_players(),
+    await message.answer_photo(
+        photo=UserMenuMessages.get_top_players_photo(),
+        caption=UserMenuMessages.get_top_players(),
         reply_markup=get_top_players_markup(top_players=top_users, selected_period='all'),
     )
 
@@ -48,7 +49,7 @@ async def handle_top_players_callback(callback: CallbackQuery, callback_data: Me
     markup = get_top_players_markup(top_players=top_players, selected_period=callback_data.option)
 
     try:
-        await callback.message.edit_text(text=UserMenuMessages.get_top_players(), reply_markup=markup)
+        await callback.message.edit_caption(caption=UserMenuMessages.get_top_players(), reply_markup=markup)
     except TelegramBadRequest:
         pass
 

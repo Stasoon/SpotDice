@@ -16,8 +16,23 @@ from .withdraw import register_withdraw_handlers
 async def get_profile_message_data(user_id: int) -> dict:
     user = await users.get_user_or_none(user_id)
     text = await UserMenuMessages.get_profile(user)
+    photo = UserMenuMessages.get_profile_photo()
     reply_markup = UserMenuKeyboards.get_profile()
-    return {'text': text, 'reply_markup': reply_markup, 'parse_mode': 'HTML'}
+    return {'photo': photo, 'caption': text, 'reply_markup': reply_markup}
+
+
+async def edit_message_to_profile(user_id: int, message: Message) -> None:
+    user = await users.get_user_or_none(user_id)
+    text = await UserMenuMessages.get_profile(user)
+    photo = UserMenuMessages.get_profile_photo()
+    reply_markup = UserMenuKeyboards.get_profile()
+
+    if message.photo:
+        await message.edit_caption(caption=text, reply_markup=reply_markup)
+    else:
+        await message.answer_photo(photo=photo, caption=text, reply_markup=reply_markup)
+        await message.delete()
+    # return {'caption': text, 'reply_markup': reply_markup}
 
 
 # endregion
@@ -30,7 +45,7 @@ async def handle_profile_button(message: Message, state: FSMContext):
     """Показывает сообщение по нажатию на кнопку Профиль"""
     await state.clear()
     msg_data = await get_profile_message_data(message.from_user.id)
-    await message.answer(**msg_data)
+    await message.answer_photo(**msg_data)
 
 
 # Реферальная система
@@ -38,17 +53,17 @@ async def handle_referral_system_callback(callback: CallbackQuery):
     """Показывает сообщение по нажатию на кнопку Реферальная система"""
     bot_username = (await callback.bot.get_me()).username
     user_id = callback.from_user.id
-    await callback.message.edit_text(
-        text=await UserMenuMessages.get_referral_system(bot_username, user_id),
-        reply_markup=UserMenuKeyboards.get_referral_system(bot_username, user_id),
-        parse_mode='HTML'
+    await callback.message.edit_caption(
+        caption=await UserMenuMessages.get_referral_system(bot_username, user_id),
+        reply_markup=UserMenuKeyboards.get_referral_system(bot_username, user_id)
     )
 
 
 # обработка кнопок Назад
 async def handle_back_in_profile_callbacks(callback: CallbackQuery):
     """Обработка нажатия на кнопку назад в Профиль"""
-    await callback.message.edit_text(**(await get_profile_message_data(callback.from_user.id)))
+    await edit_message_to_profile(user_id=callback.from_user.id, message=callback.message)
+    # await callback.message.edit_caption(**(await get_profile_message_data(callback.from_user.id)))
 
 
 # endregion

@@ -75,10 +75,9 @@ async def handle_cancel_deposit(message: Message, state: FSMContext):
 
 async def handle_deposit_callback(callback: CallbackQuery):
     """Показывает сообщение с методами пополнения"""
-    await callback.message.edit_text(
-        text=UserPaymentMessages.get_choose_deposit_method(),
-        reply_markup=UserPaymentKeyboards.get_deposit_methods(),
-        parse_mode='HTML'
+    await callback.message.edit_caption(
+        caption=UserPaymentMessages.get_choose_deposit_method(),
+        reply_markup=UserPaymentKeyboards.get_deposit_methods()
     )
 
 
@@ -101,7 +100,7 @@ async def handle_show_deposit_method_callbacks(
     if callback_data.method == DepositMethod.CRYPTO_BOT:
         text = UserPaymentMessages.choose_currency()
         markup = await UserPaymentKeyboards.get_crypto_bot_choose_currency('deposit')
-        await callback.message.edit_text(text=text, reply_markup=markup, parse_mode='HTML')
+        await callback.message.edit_caption(caption=text, reply_markup=markup)
 
     # если метод вывода - полуавтоматический
     elif callback_data.method in (DepositMethod.SBP, DepositMethod.U_MONEY, DepositMethod.QIWI):
