@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from settings import Config
 from src.database import users
 from src.keyboards.user import UserMenuKeyboards, UserPaymentKeyboards
-from src.messages import UserPaymentMessages, InputErrors, BalanceErrors
+from src.messages import UserPaymentMessages, InputErrors, BalanceErrors, UserMenuMessages
 from src.misc import (MenuNavigationCallback, WithdrawCallback, WithdrawMethod,
                       ConfirmWithdrawRequisitesCallback)
 from src.misc.states import HalfAutoWithdrawStates
@@ -46,9 +46,13 @@ async def handle_cancel_withdraw(message: Message, state: FSMContext):
     """ Обработка нажатия на кнопку отмены вывода средств """
     await state.clear()
     await message.answer(
-        text=UserPaymentMessages.get_withdrawing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu())
-    await message.answer(
-        text=UserPaymentMessages.get_choose_withdraw_method(), reply_markup=UserPaymentKeyboards.get_withdraw_methods())
+        text=UserPaymentMessages.get_withdrawing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu()
+    )
+    await message.answer_photo(
+        photo=UserMenuMessages.get_profile_photo(),
+        caption=UserPaymentMessages.get_choose_withdraw_method(),
+        reply_markup=UserPaymentKeyboards.get_withdraw_methods()
+    )
 
 
 async def handle_withdraw_callback(callback: CallbackQuery):
