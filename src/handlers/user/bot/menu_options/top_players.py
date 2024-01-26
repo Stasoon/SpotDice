@@ -12,9 +12,8 @@ from src.misc import MenuNavigationCallback
 
 async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
     top_players = await get_top_winners_by_count(days_back=days_back, limit=10)
-    data = []
 
-    for user in top_players:
+    async def get_user_info(user):
         is_private = True
         try:
             user_chat = await bot.get_chat(chat_id=user.telegram_id)
@@ -23,8 +22,10 @@ async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
             await asyncio.sleep(e.retry_after)
         except Exception:
             is_private = True
+        return user.name, None if is_private else user.telegram_id, user.wins_count
 
-        data.append((user.name, None if is_private else user.telegram_id, user.wins_count))
+    tasks = [get_user_info(user) for user in top_players]
+    data = await asyncio.gather(*tasks)
 
     return data
 

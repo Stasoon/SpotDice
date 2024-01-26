@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from settings import Config
 from src.database import transactions
 from src.keyboards.user import UserPaymentKeyboards, UserMenuKeyboards
-from src.messages import UserPaymentMessages, BalanceErrors, InputErrors, PaymentErrors
+from src.messages import UserPaymentMessages, BalanceErrors, InputErrors, PaymentErrors, UserMenuMessages
 from src.misc.states import HalfAutoDepositStates, AutoDepositStates
 from src.utils import cryptobot, post_payment, logger
 from src.misc import (
@@ -68,8 +68,10 @@ async def handle_cancel_deposit(message: Message, state: FSMContext):
     await message.answer(
         text=UserPaymentMessages.get_depositing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu()
     )
-    await message.answer(
-        text=UserPaymentMessages.get_choose_deposit_method(), reply_markup=UserPaymentKeyboards.get_deposit_methods()
+    await message.answer_photo(
+        photo=UserMenuMessages.get_profile_photo(),
+        caption=UserPaymentMessages.get_choose_deposit_method(),
+        reply_markup=UserPaymentKeyboards.get_deposit_methods()
     )
 
 
