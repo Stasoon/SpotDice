@@ -65,14 +65,13 @@ async def show_game_category(
 async def show_basic_game_types(to_message: Message):
     await to_message.edit_caption(
         caption=UserPrivateGameMessages.get_choose_game_type(),
-        reply_markup=UserBotGameKeyboards.get_basic_game_types(),
-        parse_mode='HTML'
+        reply_markup=UserBotGameKeyboards.get_basic_game_types()
     )
 
 
 async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_category: GameCategory):
-    await callback.message.edit_reply_markup(reply_markup=None)
     message = callback.message
+    await message.delete()
 
     message_instance = get_message_instance_by_game_type(game_type=game_type)
     text = await UserPrivateGameMessages.enter_bet_amount(
@@ -83,8 +82,6 @@ async def show_bet_entering(callback: CallbackQuery, game_type: GameType, game_c
 
     if photo: await message.answer_photo(photo=photo, caption=text, reply_markup=markup)
     else: await message.answer(text=text, reply_markup=markup)
-
-    await message.delete()
 
 
 # endregion
@@ -113,8 +110,7 @@ async def handle_game_category_stats_callback(callback: CallbackQuery, callback_
     game_category = callback_data.game_category
     await callback.message.edit_caption(
         caption=await UserPrivateGameMessages.get_game_category_stats(game_category),
-        reply_markup=UserBotGameKeyboards.get_back_from_stats(game_category),
-        parse_mode='HTML'
+        reply_markup=UserBotGameKeyboards.get_back_from_stats(game_category)
     )
 
 
@@ -251,7 +247,9 @@ def register_play_handlers(router: Router):
 
     # показать категорию
     router.callback_query.register(handle_game_category_callback, GamesCallback.filter(
-        (F.action == 'show') & F.game_category))
+        (F.action == 'show') &
+        F.game_category.in_((GameCategory.BASIC, GameCategory.BACCARAT, GameCategory.BLACKJACK))
+    ))
 
     # статистика
     router.callback_query.register(handle_game_category_stats_callback, GamesCallback.filter(

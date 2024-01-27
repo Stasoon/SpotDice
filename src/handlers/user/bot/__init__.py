@@ -2,9 +2,10 @@ from aiogram import Router
 
 from src.filters import ChatTypeFilter, ActiveGameFilter
 from src.middlewares import ThrottlingMiddleware
+from src.handlers.user.bot.game_strategies.mines import register_mines_handlers
 from .start_command import register_start_command_handler
 from .menu_options import register_menu_options_handlers
-from .even_uneven import register_even_uneven_handlers
+from src.handlers.user.bot.game_strategies.even_uneven import register_even_uneven_handlers
 from src.handlers.user.bot.join_and_confirm_game import register_join_game_handlers
 from .game_strategies import register_games_strategies_handlers
 
@@ -33,6 +34,9 @@ def register_bot_handlers(router: Router):
 
     # Регистрация ввода ставки even_uneven
     register_even_uneven_handlers(menu_router)
+
+    # Регистрация игры Mines
+    register_mines_handlers(menu_router)
 
     # Регистрация игрового процесса
     games_router = Router(name='games_router')

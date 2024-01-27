@@ -12,8 +12,9 @@ from src.misc import MenuNavigationCallback
 
 async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
     top_players = await get_top_winners_by_count(days_back=days_back, limit=10)
+    data = []
 
-    async def get_user_info(user):
+    for user in top_players:
         is_private = True
         try:
             user_chat = await bot.get_chat(chat_id=user.telegram_id)
@@ -22,10 +23,8 @@ async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
             await asyncio.sleep(e.retry_after)
         except Exception:
             is_private = True
-        return user.name, None if is_private else user.telegram_id, user.wins_count
 
-    tasks = [get_user_info(user) for user in top_players]
-    data = await asyncio.gather(*tasks)
+        data.append((user.name, None if is_private else user.telegram_id, user.wins_count))
 
     return data
 
@@ -33,9 +32,8 @@ async def get_top_players_without_privacy_mode(bot: Bot, days_back: int = None):
 async def handle_top_player_button(message: Message):
     top_users = await get_top_players_without_privacy_mode(bot=message.bot)
 
-    await message.answer_photo(
-        photo=UserMenuMessages.get_top_players_photo(),
-        caption=UserMenuMessages.get_top_players(),
+    await message.answer(
+        text=UserMenuMessages.get_top_players(),
         reply_markup=get_top_players_markup(top_players=top_users, selected_period='all'),
     )
 
@@ -50,7 +48,7 @@ async def handle_top_players_callback(callback: CallbackQuery, callback_data: Me
     markup = get_top_players_markup(top_players=top_players, selected_period=callback_data.option)
 
     try:
-        await callback.message.edit_caption(caption=UserMenuMessages.get_top_players(), reply_markup=markup)
+        await callback.message.edit_text(text=UserMenuMessages.get_top_players(), reply_markup=markup)
     except TelegramBadRequest:
         pass
 

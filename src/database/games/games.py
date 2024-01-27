@@ -62,7 +62,7 @@ async def get_players_of_game(game: Game) -> List[User]:
 
 async def get_player_ids_of_game(game: Game) -> List[int]:
     """Возвращает список с telegram id игроков"""
-    return [user.telegram_id for user in await game.players.all()]
+    return await game.players.all().values_list('telegram_id', flat=True)
 
 
 async def is_game_full(game: Game) -> bool:

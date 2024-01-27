@@ -1,13 +1,12 @@
 import asyncio
 
 from aiogram import F, Router
-from aiogram.enums import ChatMemberStatus
 from aiogram.filters import CommandStart
 from aiogram.filters.command import CommandObject
 from aiogram.fsm.context import FSMContext
-from aiogram.types import Message, CallbackQuery, ReplyKeyboardRemove
+from aiogram.types import Message
 
-from src.handlers.user.bot import even_uneven
+from src.handlers.user.bot.game_strategies import even_uneven
 from src.handlers.user.bot.menu_options.bands import show_band_to_join
 from src.keyboards import UserBotGameKeyboards
 from src.keyboards.user import UserMenuKeyboards

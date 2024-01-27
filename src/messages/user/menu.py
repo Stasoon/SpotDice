@@ -7,27 +7,21 @@ from src.database.transactions import referral_bonuses
 from src.database.transactions.bets import get_total_bets_sum
 from src.misc.enums.leagues import BandLeague
 from src.utils.text_utils import format_float_to_rub_string
-from settings import Config
 
 
 class UserMenuMessages:
 
     @staticmethod
     def get_welcome() -> str:
-        return (
-            f"<b>Добро пожаловать!</b> \n\n"
-            f"@SpotDice — беседа нашего заведения \n\n"
-            f"Вводи команду /help в игровом чате, она покажет и расскажет тебе о всех функциях игры. \n"
-            f"Вникай и скорее к игровому столу 💎"
-        )
+        return f"<b>Добро пожаловать!</b> \n\n@SpotDice — беседа нашего заведения \n\n" \
+               f"Вводи команду /help в игровом чате, она покажет и расскажет тебе о всех функциях игры. \nВникай и скорее к игровому столу 💎"
 
     @staticmethod
     def get_welcome_sticker() -> str:
         stickers = (
             'CAACAgIAAxkBAAIeE2WXbhUtjQ3cMteg1wxI5MK6NdguAAKEPQACjb6pSPbkiqaCZlawNAQ',
             'CAACAgIAAxkBAAIeFGWXbuxrns2NnF3HPAnfSJkQUBfEAAKbOgACfqSJSm6moJb_jUEUNAQ',
-            'CAACAgIAAxkBAAECKcpll289p75DflvG23RG4TZ5ni3i9wAC6UEAAjKGSEtfcMDufg0AAeM0BA',
-            'CAACAgIAAxkBAAECMF1ls303n2Jrop1UTkadp7Gw5LDy3wAC7EUAAujDmEmbCNBJqtHm8TQE'
+            'CAACAgIAAxkBAAECKcpll289p75DflvG23RG4TZ5ni3i9wAC6UEAAjKGSEtfcMDufg0AAeM0BA'
         )
         return random.choice(stickers)
 
@@ -35,18 +29,14 @@ class UserMenuMessages:
     def get_user_agreement_animation() -> str:
         return 'https://telegra.ph/file/39827678fc24d72d687f1.mp4'
 
-    # @staticmethod
-    # def get_need_sub() -> str:
-    #     return 'Перед тем, как войти в комнату с игровыми столами — подпишись на <b>BarredNews</b>, новости нашего города 💎'
+    @staticmethod
+    def get_need_sub() -> str:
+        return 'Перед тем, как войти в комнату с игровыми столами — подпишись на <b>BarredNews</b>, новости нашего города 💎'
 
     @staticmethod
     def get_play_menu(user: User) -> str:
         balance_str = html.code(format_float_to_rub_string(user.balance))
-        return (
-            f'👤 Вы в игровом меню \n'
-            f'🪙 Баланс: {balance_str} \n\n'
-            f'/deposit — нажми, чтобы пополнить баланс'
-        )
+        return f'👤 Вы в игровом меню \n🪙 Баланс: {balance_str} \n\n/deposit — нажми, чтобы пополнить баланс'
 
     @staticmethod
     def get_play_menu_photo() -> str:
@@ -67,7 +57,7 @@ class UserMenuMessages:
             f'👤 Кол-во рефералов: {user_referrals_count} \n'
             f'💰 Заработано: {earned_amount} \n\n'
             f'— За каждую победу Вашего реферала - Вы будете получать {percent_to_referrer * 100}% \n'
-            f'— Вывод заработанных денег возможен от {format_float_to_rub_string(Config.Payments.min_withdraw_amount)} \n\n'
+            f'— Вывод заработанных денег возможен от 300 ₽ \n\n'
             f'🔗 Ваша партнёрская ссылка: \n<code>https://t.me/{bot_username}?start=ref{user_id}</code>'
         )
 
@@ -95,10 +85,6 @@ class UserMenuMessages:
         return f'{html.bold("🎖 10-ка лучших игроков")} \n\n{html.code("Имя  |  Количество побед")}'
 
     @staticmethod
-    def get_top_players_photo() -> str:
-        return 'https://telegra.ph/file/17ab6eb767c6c90405302.png'
-
-    @staticmethod
     async def get_profile(user: User) -> str:
         user_band = await bands.get_user_band(telegram_id=user.telegram_id)
 
@@ -115,10 +101,6 @@ class UserMenuMessages:
             f'➕ Пополнил:  {format_float_to_rub_string(await transactions.get_user_all_deposits_sum(user))} \n'
             f'➖ Вывел:  {format_float_to_rub_string(await transactions.get_user_all_withdraws_sum(user))} \n'
         )
-
-    @staticmethod
-    def get_profile_photo() -> str:
-        return 'https://telegra.ph/file/2983d00e09fbd8aaaa404.png'
 
     @staticmethod
     def get_promo_activated(bonus_amount: float) -> str:

@@ -4,7 +4,7 @@ from src.messages.user.games.game_messages_abc import GameCategoryMessages
 class StandardGameCategoryMessages(GameCategoryMessages):
     @staticmethod
     def get_category_photo() -> str:
-        return 'https://telegra.ph/file/b057256c4bc0aeefd26ee.png'
+        return 'https://telegra.ph/file/b2d6791839dffc50bae8b.png'
 
     @staticmethod
     def get_category_description(player_name: str) -> str:

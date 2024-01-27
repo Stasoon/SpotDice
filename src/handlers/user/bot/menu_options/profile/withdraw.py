@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from settings import Config
 from src.database import users
 from src.keyboards.user import UserMenuKeyboards, UserPaymentKeyboards
-from src.messages import UserPaymentMessages, InputErrors, BalanceErrors, UserMenuMessages
+from src.messages import UserPaymentMessages, InputErrors, BalanceErrors
 from src.misc import (MenuNavigationCallback, WithdrawCallback, WithdrawMethod,
                       ConfirmWithdrawRequisitesCallback)
 from src.misc.states import HalfAutoWithdrawStates
@@ -46,13 +46,9 @@ async def handle_cancel_withdraw(message: Message, state: FSMContext):
     """ Обработка нажатия на кнопку отмены вывода средств """
     await state.clear()
     await message.answer(
-        text=UserPaymentMessages.get_withdrawing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu()
-    )
-    await message.answer_photo(
-        photo=UserMenuMessages.get_profile_photo(),
-        caption=UserPaymentMessages.get_choose_withdraw_method(),
-        reply_markup=UserPaymentKeyboards.get_withdraw_methods()
-    )
+        text=UserPaymentMessages.get_withdrawing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu())
+    await message.answer(
+        text=UserPaymentMessages.get_choose_withdraw_method(), reply_markup=UserPaymentKeyboards.get_withdraw_methods())
 
 
 async def handle_withdraw_callback(callback: CallbackQuery):
@@ -63,9 +59,10 @@ async def handle_withdraw_callback(callback: CallbackQuery):
         await callback.answer(text=BalanceErrors.low_balance_for_withdraw(min_withdraw_amount), show_alert=True)
         return
 
-    await callback.message.edit_caption(
-        caption=UserPaymentMessages.get_choose_withdraw_method(),
-        reply_markup=UserPaymentKeyboards.get_withdraw_methods()
+    await callback.message.edit_text(
+        text=UserPaymentMessages.get_choose_withdraw_method(),
+        reply_markup=UserPaymentKeyboards.get_withdraw_methods(),
+        parse_mode='HTML'
     )
 
 
@@ -79,6 +76,7 @@ async def handle_withdraw_command(message: Message):
     await message.answer(
         text=UserPaymentMessages.get_choose_withdraw_method(),
         reply_markup=UserPaymentKeyboards.get_withdraw_methods(),
+        parse_mode='HTML'
     )
 
 

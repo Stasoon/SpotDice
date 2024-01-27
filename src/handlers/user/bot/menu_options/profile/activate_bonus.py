@@ -18,19 +18,15 @@ async def handle_cancel_bonus_activation(message: Message, state: FSMContext):
 
     user = await users.get_user_or_none(message.from_user.id)
     text = await UserMenuMessages.get_profile(user)
-    photo = UserMenuMessages.get_profile_photo()
     reply_markup = UserMenuKeyboards.get_profile()
-    await message.answer_photo(photo=photo, caption=text, reply_markup=reply_markup)
+    await message.answer(text=text, reply_markup=reply_markup)
 
 
 async def handle_activate_bonus_callback(callback: CallbackQuery, state: FSMContext):
-    photo = UserMenuMessages.get_profile_photo()
-    await callback.message.answer_photo(
-        photo=photo,
-        caption='<b>✍🏻 Введите ваш промокод:</b>',
-        reply_markup=UserMenuKeyboards.get_cancel_reply()
-    )
     await callback.message.delete()
+    await callback.message.answer(
+        text='<b>✍🏻 Введите ваш промокод:</b>', reply_markup=UserMenuKeyboards.get_cancel_reply()
+    )
     await state.set_state(ActivateBonusStates.wait_for_code)
 
 

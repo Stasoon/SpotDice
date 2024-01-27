@@ -6,7 +6,7 @@ from aiogram.types import CallbackQuery, Message
 from settings import Config
 from src.database import transactions
 from src.keyboards.user import UserPaymentKeyboards, UserMenuKeyboards
-from src.messages import UserPaymentMessages, BalanceErrors, InputErrors, PaymentErrors, UserMenuMessages
+from src.messages import UserPaymentMessages, BalanceErrors, InputErrors, PaymentErrors
 from src.misc.states import HalfAutoDepositStates, AutoDepositStates
 from src.utils import cryptobot, post_payment, logger
 from src.misc import (
@@ -68,18 +68,17 @@ async def handle_cancel_deposit(message: Message, state: FSMContext):
     await message.answer(
         text=UserPaymentMessages.get_depositing_canceled(), reply_markup=UserMenuKeyboards.get_main_menu()
     )
-    await message.answer_photo(
-        photo=UserMenuMessages.get_profile_photo(),
-        caption=UserPaymentMessages.get_choose_deposit_method(),
-        reply_markup=UserPaymentKeyboards.get_deposit_methods()
+    await message.answer(
+        text=UserPaymentMessages.get_choose_deposit_method(), reply_markup=UserPaymentKeyboards.get_deposit_methods()
     )
 
 
 async def handle_deposit_callback(callback: CallbackQuery):
     """Показывает сообщение с методами пополнения"""
-    await callback.message.edit_caption(
-        caption=UserPaymentMessages.get_choose_deposit_method(),
-        reply_markup=UserPaymentKeyboards.get_deposit_methods()
+    await callback.message.edit_text(
+        text=UserPaymentMessages.get_choose_deposit_method(),
+        reply_markup=UserPaymentKeyboards.get_deposit_methods(),
+        parse_mode='HTML'
     )
 
 
@@ -102,7 +101,7 @@ async def handle_show_deposit_method_callbacks(
     if callback_data.method == DepositMethod.CRYPTO_BOT:
         text = UserPaymentMessages.choose_currency()
         markup = await UserPaymentKeyboards.get_crypto_bot_choose_currency('deposit')
-        await callback.message.edit_caption(caption=text, reply_markup=markup)
+        await callback.message.edit_text(text=text, reply_markup=markup, parse_mode='HTML')
 
     # если метод вывода - полуавтоматический
     elif callback_data.method in (DepositMethod.SBP, DepositMethod.U_MONEY, DepositMethod.QIWI):

@@ -17,6 +17,7 @@ from src.messages.user.games import BaccaratMessages
 from src.keyboards import UserMenuKeyboards
 from src.misc import GameStatus
 from src.utils.cards import get_shuffled_deck, Card
+from settings import Config
 from src.utils.timer import BaseTimer
 
 # region Utils
@@ -122,28 +123,21 @@ async def process_game_and_get_won_option(bot: Bot, game: Game):
         return winner
 
     # выдача карты игроку, если от 0 до 5 очков
-    player_ids = await games.get_player_ids_of_game(game=game)
-
+    sender = GameMessageSender(bot, game)
     if player_points <= 5:
         player_third_card = await deal_card(deck=deck, player_id=PLAYER_ID, game=game)
-        for player_id in player_ids:
-            await bot.send_message(chat_id=player_id, text='Игрок берёт третью карту...')
-            await asyncio.sleep(0.05)
+        await sender.send(text='Игрок берёт третью карту...')
         await asyncio.sleep(1)
 
         # если игрок взял третью карту, проверяем, должен ли банкир брать карту по правилам
         if should_dealer_pick_third_card(banker_points, player_third_card):
             await deal_card(deck=deck, player_id=BANKER_ID, game=game)
-            for player_id in player_ids:
-                await bot.send_message(chat_id=player_id, text='Игрок берёт третью карту...')
-                await asyncio.sleep(0.05)
+            await sender.send(text='Дилер берёт третью карту...')
             await asyncio.sleep(1)
     # если игрок не взял карту, но у дилера от 0 до 5, берёт карту
     elif banker_points < 6:
         await deal_card(deck=deck, player_id=BANKER_ID, game=game)
-        for player_id in player_ids:
-            await bot.send_message(chat_id=player_id, text='Игрок берёт третью карту...')
-            await asyncio.sleep(0.05)
+        await sender.send(text='Дилер берёт третью карту...')
         await asyncio.sleep(1)
 
 
@@ -170,16 +164,14 @@ async def send_result_to_players(bot, game: Game, bet_choices: Collection[Player
     )).photo[0].file_id
 
     # Копируем фото другим игрокам, если оно создалось успешно
+    sender = GameMessageSender(bot, game)
     if result_photo_file_id:
-        for player_id in player_ids[1:]:
-            await bot.send_photo(photo=result_photo_file_id, chat_id=player_id)
+        await sender.send(photo=result_photo_file_id, player_ids=player_ids[1:])
 
     # Отправляем сообщение с результатами игры всем игрокам
     text = await BaccaratMessages.get_baccarat_results(bet_choices)
     reply_markup = UserMenuKeyboards.get_main_menu()
-
-    for player_id in player_ids:
-        await bot.send_message(chat_id=player_id, text=text, reply_markup=reply_markup)
+    await sender.send(text, markup=reply_markup)
 
 
 class BaccaratTimer(BaseTimer):
@@ -302,9 +294,7 @@ class BaccaratStrategy(GameStrategy):
             return
         await games.finish_game(game)
 
-        player_ids = await games.get_player_ids_of_game(game=game)
-        for player_id in player_ids:
-            await bot.send_message(chat_id=player_id, text='Все игроки сделали ставки')
+        await GameMessageSender(bot, game).send(text='Все игроки сделали ставки')
         await process_game_and_get_won_option(game=game, bot=bot)
 
         player_res = await playing_cards.count_player_score(game_number=game.number, player_id=PLAYER_ID) % 10

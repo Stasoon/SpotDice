@@ -16,10 +16,6 @@ class DiceMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return random.choice(texts)
 
     @staticmethod
-    def get_ask_for_bet_photo() -> str:
-        return 'https://telegra.ph/file/3e7adace48ad113a49549.png'
-
-    @staticmethod
     def get_game_created(game_number: int):
         return CreatableGamesMessages.get_game_created(game_number=game_number)
 

@@ -2,7 +2,6 @@ import asyncio
 import io
 import os
 import json
-from concurrent.futures import ThreadPoolExecutor
 
 import aiofiles
 from PIL import Image, ImageDraw, ImageFont
@@ -97,9 +96,7 @@ async def save_maps_photos(bot: Bot, chat_id: int):
         top_league_bands = await bands.get_bands_rating_in_league(league=league, count=6)
         band_names = [band.title for band in top_league_bands]
 
-        loop = asyncio.get_event_loop()
-        executor = ThreadPoolExecutor()
-        map_photo = await loop.run_in_executor(executor, draw_bands_map, band_names, league)
+        map_photo = draw_bands_map(band_names, league)
         map_message = await bot.send_photo(photo=map_photo, chat_id=chat_id)
 
         map_file_id = map_message.photo[0].file_id

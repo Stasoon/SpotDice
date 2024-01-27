@@ -76,10 +76,10 @@ class EvenUnevenMessages:
         return random.choice(texts).format(amount=format_float_to_rub_string(amount))
 
     @staticmethod
-    def get_player_loose(bet_option: EvenUnevenBetOption) -> str:
+    def get_player_loose(bet: EvenUnevenBetOption) -> str:
         texts = ('<b>🎲 Вы проиграли</b>',)
 
-        match bet_option:
+        match bet:
             case EvenUnevenBetOption.LESS_7:
                 texts = (
                     'DICY: Увы, но на этот раз на кубах значение больше 7. \nНадо было делать другую ставку.',

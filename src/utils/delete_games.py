@@ -52,3 +52,4 @@ async def delete_unconfirmed_games(bot: Bot):
                 await make_refund_and_notify_players(bot=bot, game=game)
 
         await asyncio.sleep(2*60)
+

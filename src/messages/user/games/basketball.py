@@ -29,10 +29,6 @@ class BasketballMessages(BotGamesMessagesBase, CreatableGamesMessages):
         return f"{description} \n\n{random.choice(texts)}"
 
     @staticmethod
-    def get_ask_for_bet_photo() -> str:
-        return 'https://telegra.ph/file/6d050aed0bbd6b9d14882.png'
-
-    @staticmethod
     def get_game_started():
         return 'Бросай мяч!'
 
