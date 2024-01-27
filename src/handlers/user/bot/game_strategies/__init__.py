@@ -3,6 +3,7 @@ from aiogram import Router
 from .basic_games import BasicGameStrategy
 from .baccarat import BaccaratStrategy
 from .blackjack import BlackJackStrategy
+from .mines import register_mines_handlers
 
 
 def register_games_strategies_handlers(router: Router):
@@ -14,3 +15,4 @@ def register_games_strategies_handlers(router: Router):
 
     for strategy in game_strategies:
         strategy.register_moves_handlers(router)
+    register_mines_handlers(router)

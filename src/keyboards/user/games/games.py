@@ -72,8 +72,10 @@ class UserBotGameKeyboards:
             action='show', game_category=GameCategory.BLACKJACK, game_type=GameType.BJ))
         builder.button(text='🎴 Baccarat', callback_data=GamesCallback(
             action='show', game_category=GameCategory.BACCARAT, game_type=GameType.BACCARAT))
+        builder.button(text='💎 Mines', callback_data=GamesCallback(
+            action='show', game_category=GameCategory.MINES, game_type=GameType.MINES))
         builder.button(text='⚪ EvenUNeven', url='https://t.me/+lLucdqFEjK9mZDUy')
-        builder.adjust(1)
+        builder.adjust(1, 2, 1, 1)
         return builder.as_markup()
 
     @staticmethod

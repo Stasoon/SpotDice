@@ -251,7 +251,9 @@ def register_play_handlers(router: Router):
 
     # показать категорию
     router.callback_query.register(handle_game_category_callback, GamesCallback.filter(
-        (F.action == 'show') & F.game_category))
+        (F.action == 'show') &
+        F.game_category.in_((GameCategory.BASIC, GameCategory.BACCARAT, GameCategory.BLACKJACK))
+    ))
 
     # статистика
     router.callback_query.register(handle_game_category_stats_callback, GamesCallback.filter(

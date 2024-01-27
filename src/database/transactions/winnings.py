@@ -11,16 +11,23 @@ from src.misc import GameCategory
 from src.utils import logger
 
 
+def calculate_amount_with_commission(amount: float) -> Decimal:
+    if amount <= 0:
+        return Decimal(0.0)
+
+    winning_commission = Decimal(1 - Config.Payments.winning_commission)
+    amount_with_commission = Decimal(amount) * winning_commission
+    return amount_with_commission
+
+
 async def accrue_winnings(winner_telegram_id: int, amount: float, game_category: GameCategory) -> Decimal:
     """
     Начисление выигрыша победителю и процента пригласившему.
     Возвращает выигрыш с учётом комиссии
     """
-    if amount <= 0:
-        return 0
-
-    winning_commission = Decimal(1 - Config.Payments.winning_commission)
-    amount_with_commission = Decimal(amount) * winning_commission
+    amount_with_commission = calculate_amount_with_commission(amount=amount)
+    if amount_with_commission <= 0:
+        return amount_with_commission
 
     try:
         user = await User.get(telegram_id=winner_telegram_id)

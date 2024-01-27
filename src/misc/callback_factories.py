@@ -15,6 +15,33 @@ class BlackJackCallback(CallbackData, prefix='BJ'):
     move: Literal['take', 'stand']
 
 
+class MinesCreationCallback(CallbackData, prefix='mines_creation'):
+    mines_count: int
+    bet: float
+    action: str
+
+
+class MinesCallback(CallbackData, prefix='mines_gameplay'):
+    """
+    x: int
+    y: int
+    is_mine: Literal['True', 'False']
+    is_opened: Literal['True', 'False']
+    """
+    x: int
+    y: int
+    is_mine: Literal['True', 'False']
+    is_opened: Literal['True', 'False']
+
+    @staticmethod
+    def from_string(data: str):
+        try:
+            x, y, is_mine, is_opened = data.split(':')[1:]
+            return MinesCallback(x=int(x), y=int(y), is_mine=is_mine, is_opened=is_opened)
+        except ValueError:
+            return None
+
+
 class GamesCallback(CallbackData, prefix="games"):
     """
     action: str  \n

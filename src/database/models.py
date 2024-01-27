@@ -140,6 +140,13 @@ class EvenUnevenPlayerBet(Model):
         table = "even_uneven_player_bet"
 
 
+class MinesGameData(Model):
+    player = fields.ForeignKeyField('models.User', related_name='')
+    game = fields.ForeignKeyField('models.Game', related_name='')
+    mines_count = fields.SmallIntField()
+    cells_opened = fields.SmallIntField(default=0)
+
+
 # endregion
 
 

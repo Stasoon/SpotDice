@@ -32,6 +32,7 @@ class GameCategory(str, Enum):
     BLACKJACK = 'BlackJack'
     BACCARAT = 'Baccarat'
     EVEN_UNEVEN = 'EuN'
+    MINES = 'Mines'
 
 
 class GameType(str, Enum):
@@ -44,6 +45,7 @@ class GameType(str, Enum):
     FOOTBALL = '⚽'
     BJ = '♠'
     BACCARAT = '🎴'
+    MINES = '💎'
 
     def get_full_name(self) -> str:
         """Возвращает строку с полным именем игры"""
@@ -56,6 +58,7 @@ class GameType(str, Enum):
             case GameType.FOOTBALL: return "Футбол"
             case GameType.BJ: return 'BlackJack'
             case GameType.BACCARAT: return 'Баккарат'
+            case GameType.MINES: return 'Мины'
             case _: return "Игра"
 
 
