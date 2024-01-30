@@ -1,4 +1,18 @@
 from src.database.models import MinesGameData, User, Game
+from src.misc import GameType, GameCategory
+
+
+async def get_last_bet_amount(user_id: int) -> float | None:
+    last_mines_game: Game | None = (
+        await Game
+        .filter(creator_id=user_id, category=GameCategory.MINES, game_type=GameType.MINES)
+        .order_by('-number')
+        .first()
+    )
+
+    if last_mines_game:
+        return last_mines_game.bet
+    return None
 
 
 async def create(user: User, game: Game, mines_count: int) -> MinesGameData:

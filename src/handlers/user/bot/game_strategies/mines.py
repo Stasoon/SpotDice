@@ -41,7 +41,7 @@ def calculate_coefficient(mines_count: int, opened_cells_count: int) -> float:
     if n == 0:
         n += 1
 
-    coefficient = (1 + cells_count / n - (mines_count/(opened_cells_count+1))**(1/8)) * (opened_cells_count**0.1)
+    coefficient = (1 + cells_count / n - (mines_count/(opened_cells_count+1))**(1/8)) * (opened_cells_count**0.01)
     return round(coefficient, 2)
 
 
@@ -79,7 +79,13 @@ async def handle_create_mines_callback(callback: CallbackQuery):
         return
 
     default_mines_count = 5
-    default_bet = 15.0
+    default_minimal_bet = 15
+
+    last_player_bet = await mines.get_last_bet_amount(user_id=callback.from_user.id)
+    if last_player_bet:
+        default_bet = int(last_player_bet) if user.balance >= last_player_bet else int(user.balance)
+    else:
+        default_bet = default_minimal_bet
 
     text = MinesMessages.get_setup_game(balance=user.balance)
     markup = MinesKeyboards.get_creation(mines_count=default_mines_count, bet=default_bet)
@@ -89,7 +95,7 @@ async def handle_create_mines_callback(callback: CallbackQuery):
 async def handle_change_mines_count_callback(callback: CallbackQuery, callback_data: MinesCreationCallback):
     await callback.answer()
 
-    min_mines_count, max_mines_count = 3, 24
+    min_mines_count, max_mines_count = 4, 24
 
     new_value = adjust_value(
         action=callback_data.action, current_value=callback_data.mines_count,
@@ -105,8 +111,8 @@ async def handle_change_mines_count_callback(callback: CallbackQuery, callback_d
 async def handle_change_bet_callback(callback: CallbackQuery, callback_data: MinesCreationCallback):
     await callback.answer()
 
-    min_bet = 15.0
-    max_bet = round(await users.get_user_balance(telegram_id=callback.from_user.id)) - 1
+    min_bet = 15
+    max_bet = int(await users.get_user_balance(telegram_id=callback.from_user.id))
     max_bet = max_bet if max_bet > min_bet else min_bet  # если баланс меньше минимальной ставки
 
     new_value = adjust_value(
